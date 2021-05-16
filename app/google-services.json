@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "152877662846",
+    "project_id": "hcmut-smart-home",
+    "storage_bucket": "hcmut-smart-home.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152877662846:android:0b0ab6c933d838ee73ce2f",
+        "android_client_info": {
+          "package_name": "com.example.smarthome"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "152877662846-dp9rk2spmohu455hfj2t0659jau8sbg7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY9Cp3MySzDK9oY7jwnUxIJKrn65tevsk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "152877662846-dp9rk2spmohu455hfj2t0659jau8sbg7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

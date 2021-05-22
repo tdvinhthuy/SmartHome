@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -28,14 +29,20 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        if (checkLogin()) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+        else {
+            setContentView(R.layout.activity_login);
 
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        tvCreate = findViewById(R.id.tvCreate);
-        btnLogin = findViewById(R.id.btnLogin);
-        tvLoginError = findViewById(R.id.tvLoginError);
-        mAuth = FirebaseAuth.getInstance();
+            etEmail = findViewById(R.id.etEmail);
+            etPassword = findViewById(R.id.etPassword);
+            tvCreate = findViewById(R.id.tvCreate);
+            btnLogin = findViewById(R.id.btnLogin);
+            tvLoginError = findViewById(R.id.tvLoginError);
+            mAuth = FirebaseAuth.getInstance();
+        }
     }
 
     @Override
@@ -72,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Toast.makeText(LoginActivity.this, "Login success!",
                                     Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                         }
                         else {
@@ -83,5 +90,10 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private boolean checkLogin() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        return user != null;
     }
 }

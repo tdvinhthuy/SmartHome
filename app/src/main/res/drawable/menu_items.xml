@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_checked="true"
+        android:color="@color/selected_icon"
+        android:drawable="@color/selected_item" />
+    <item
+        android:color="@color/not_selected_icon"
+        android:drawable="@color/not_selected_item" />
+</selector>

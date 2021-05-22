@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">SmartHome</string>
+    <string name="app_name">Smart Home</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_control">Control</string>
+    <string name="menu_notifications">History</string>
+    <string name="menu_statistics">Statistics</string>
+    <string name="menu_account">Account</string>
 </resources>

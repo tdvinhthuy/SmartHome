@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navHome"
+        android:title="@string/menu_home"
+        android:icon="@drawable/round_home_white_24dp" />
+
+    <item
+        android:id="@+id/navControl"
+        android:title="@string/menu_control"
+        android:icon="@drawable/round_widgets_white_24dp"/>
+
+    <item
+        android:id="@+id/navNotifications"
+        android:title="@string/menu_notifications"
+        android:icon="@drawable/round_notifications_white_24dp"/>
+
+    <item
+        android:id="@+id/navStatistics"
+        android:title="@string/menu_statistics"
+        android:icon="@drawable/baseline_signal_cellular_alt_white_24dp"/>
+
+    <item
+        android:id="@+id/navAccount"
+        android:title="@string/menu_account"
+        android:icon="@drawable/baseline_person_white_24dp"/>
+</menu>

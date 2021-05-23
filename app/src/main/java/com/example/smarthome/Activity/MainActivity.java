@@ -1,16 +1,23 @@
-package com.example.smarthome;
+package com.example.smarthome.Activity;
 
-import android.content.Intent;
 import android.view.MenuItem;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import com.example.smarthome.Fragment.*;
+import com.example.smarthome.R;
+import com.example.smarthome.Utils.Room;
+import com.example.smarthome.Utils.RoomListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Calendar;
+
+
+public class MainActivity extends AppCompatActivity implements RoomListener {
+    private TextView tvDate;
+    private Room room;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +25,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        tvDate = findViewById(R.id.tvDate);
 
+        room = null;
+        // set date
+        setDate();
+
+        // fragment
         getSupportFragmentManager()
                 .beginTransaction()
                 .setReorderingAllowed(true)
@@ -31,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 Fragment selectedFragment = null;
                 switch (item.getItemId()) {
                     case R.id.navHome:
-                        selectedFragment = new HomeFragment();
+                        selectedFragment = new HomeFragment(room);
                         break;
                     case R.id.navControl:
                         selectedFragment = new ControlFragment();
@@ -60,5 +73,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setDate() {
+        String months[] = {
+                "Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"};
+        Calendar cal = Calendar.getInstance();
+        tvDate.setText(String.format("%s %s, %s",
+                months[cal.get(Calendar.MONTH)],
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.YEAR)));
+    }
 
+    @Override
+    public void onChange(Room room) {
+        this.room = room;
+        Fragment fragment = new HomeFragment(room);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
+    }
 }
+

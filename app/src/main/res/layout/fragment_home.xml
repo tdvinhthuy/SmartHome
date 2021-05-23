@@ -3,4 +3,257 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/layoutHome">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:padding="10dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.15"
+                app:layout_constraintVertical_bias="0.2"
+                android:id="@+id/imgLivingRoom"
+                android:src="@drawable/sofa_seat_living_room_comfortable_256"
+                android:background="@android:drawable/dialog_holo_light_frame"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/imgLivingRoom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/imgLivingRoom"
+                app:layout_constraintEnd_toEndOf="@id/imgLivingRoom"
+                app:layout_constraintVertical_bias="0.05"
+                android:text="Living Room"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:id="@+id/tvLivingRoom"/>
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/imgLivingRoom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.2"
+                android:padding="10dp"
+                android:id="@+id/imgBedroom"
+                android:src="@drawable/bedroom_04_512"
+                android:background="@android:drawable/dialog_holo_light_frame"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/imgBedroom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/imgBedroom"
+                app:layout_constraintEnd_toEndOf="@id/imgBedroom"
+                app:layout_constraintVertical_bias="0.05"
+                android:text="Bedroom"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:id="@+id/tvBedroom"/>
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                app:layout_constraintTop_toBottomOf="@id/imgLivingRoom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/imgLivingRoom"
+                app:layout_constraintEnd_toEndOf="@id/imgLivingRoom"
+                android:padding="10dp"
+                android:id="@+id/imgKitchen"
+                android:src="@drawable/istar_design_interior_design_lineicons_live_23_512"
+                android:background="@android:drawable/dialog_holo_light_frame"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/imgKitchen"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/imgKitchen"
+                app:layout_constraintEnd_toEndOf="@id/imgKitchen"
+                app:layout_constraintVertical_bias="0.2"
+                android:text="Kitchen"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:id="@+id/tvKitchen"/>
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                app:layout_constraintTop_toBottomOf="@id/imgBedroom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/imgBedroom"
+                app:layout_constraintEnd_toEndOf="@id/imgBedroom"
+                android:padding="10dp"
+                android:id="@+id/imgBathroom"
+                android:src="@drawable/istar_design_interior_design_lineicons_live_83_512"
+                android:background="@android:drawable/dialog_holo_light_frame"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/imgBathroom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@id/imgBathroom"
+                app:layout_constraintEnd_toEndOf="@id/imgBathroom"
+                app:layout_constraintVertical_bias="0.2"
+                android:text="Bathroom"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:id="@+id/tvBathroom"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/layoutRoom"
+        android:background="@color/room_background">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/back_1_512"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintVertical_bias="0.05"
+                android:id="@+id/imgBackHome"/>
+
+            <RelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.15"
+                app:layout_constraintVertical_bias="0.35"
+                android:id="@+id/rlTemperature"
+                android:background="@android:drawable/dialog_holo_light_frame">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/thermometer_75_512"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="60dp"
+                    android:layout_centerHorizontal="true"
+                    android:text="Temperature"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="95dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/temperature"
+                    android:id="@+id/tvTemperatureRoom"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:layout_constraintStart_toEndOf="@id/rlTemperature"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/rlTemperature"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.3"
+                android:id="@+id/rlLightIntensity"
+                android:background="@android:drawable/dialog_holo_light_frame">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/summer_vacation_sun_sunlight_summer_heat_hot_512"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="60dp"
+                    android:layout_centerHorizontal="true"
+                    android:text="Light Intensity"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="95dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/light_intensity"
+                    android:id="@+id/tvLightIntensityRoom"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/rlLightIntensity"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.15"
+                android:id="@+id/rlHumidity"
+                android:background="@android:drawable/dialog_holo_light_frame">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="5dp"
+                    android:src="@drawable/_19___humidity_512"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="60dp"
+                    android:layout_centerHorizontal="true"
+                    android:text="Humidity"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="95dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@color/humidity"
+                    android:id="@+id/tvHumidityRoom"/>
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</FrameLayout>

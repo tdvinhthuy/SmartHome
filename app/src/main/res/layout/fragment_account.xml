@@ -4,23 +4,108 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".AccountFragment">
-    
-    <androidx.constraintlayout.widget.ConstraintLayout
+    tools:context=".Fragment.AccountFragment">
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="16sp"
+            android:textColor="@color/name"
+            android:id="@+id/tvNameAccount"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:layout_marginLeft="50dp"
+            android:text="Email: "
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:id="@+id/ctvEmailAccount"
+            android:layout_marginStart="50dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:textColor="@color/black"
+            android:id="@+id/tvEmailAccount"
+            android:layout_toEndOf="@+id/ctvEmailAccount"
+            android:layout_toRightOf="@+id/ctvEmailAccount" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="150dp"
+            android:layout_marginLeft="50dp"
+            android:text="Phone: "
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:id="@+id/ctvPhoneAccount"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="150dp"
+            android:textColor="@color/black"
+            android:id="@+id/tvPhoneAccount"
+            android:layout_toRightOf="@id/ctvPhoneAccount"
+            android:layout_toEndOf="@id/ctvPhoneAccount" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:layout_marginLeft="50dp"
+            android:text="Last login on: "
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:id="@+id/ctvLastLoginAccount"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:id="@+id/tvLastLoginAccount"
+            android:layout_marginTop="200dp"
+            android:layout_toRightOf="@id/ctvLastLoginAccount"
+            android:layout_toEndOf="@id/ctvLastLoginAccount" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="250dp"
+            android:layout_marginLeft="50dp"
+            android:textColor="@color/black"
+            android:text="Account created on: "
+            android:id="@+id/ctvCreatedAccount"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="250dp"
+            android:textColor="@color/black"
+            android:id="@+id/tvCreatedAccount"
+            android:layout_toRightOf="@id/ctvCreatedAccount"
+            android:layout_toEndOf="@id/ctvCreatedAccount"
+            />
+
         <Button
             android:id="@+id/btnLogout"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:text="LOG OUT"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.5"/>
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="SIGN OUT"
+            android:background="@drawable/button_sign_up"
+            android:layout_marginTop="300dp"
+            android:layout_centerHorizontal="true"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 
 </FrameLayout>

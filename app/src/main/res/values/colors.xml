@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--  General  -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -8,11 +9,23 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
-<!--    my module   -->
+<!--  my module  -->
     <color name="blue_main">#3CA0FD</color>
     <color name="blue_secondary">#3C95FD</color>
+
+    <!--  fragment  -->
     <color name="selected_item">#176BB8</color>
     <color name="not_selected_item">#2992F3</color>
     <color name="selected_icon">#E5E5E5</color>
     <color name="not_selected_icon">#FFFFFF</color>
+    <color name="date">#007D99</color>
+
+    <!--  account page  -->
+    <color name="name">#F26313</color>
+
+    <!--  home page  -->
+    <color name="temperature">#F26313</color>
+    <color name="light_intensity">#DEDD11</color>
+    <color name="humidity">#3C95FD</color>
+    <color name="room_background">#F7F7F7</color>
 </resources>

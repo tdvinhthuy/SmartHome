@@ -3,4 +3,206 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.ControlFragment"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Fragment.ControlFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="600dp">
+
+        <Spinner
+            android:id="@+id/spinnerRoomControl"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.1"
+            android:background="@drawable/spinner"/>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinnerRoomControl"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rlFanControl">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="5dp"
+                    android:src="@drawable/thermometer_75_512"
+                    android:id="@+id/imgThermo"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Temperature"
+                    android:layout_toEndOf="@id/imgThermo"
+                    android:layout_toRightOf="@id/imgThermo"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30"
+                    android:textColor="@color/temperature"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:layout_below="@id/imgThermo"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="20dp"
+                    android:id="@+id/tvTemperature"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="FAN"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:layout_below="@id/tvTemperature"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/tvFan"/>
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@id/tvFan"
+                    android:layout_toRightOf="@id/tvFan"
+                    android:layout_alignBottom="@id/tvFan"
+                    android:src="@drawable/fan_cooler_512" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/tvFan"
+                    android:layout_toRightOf="@id/tvFan"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginStart="140dp"
+                    android:layout_toEndOf="@id/tvFan"
+                    android:id="@+id/switchFan"/>
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/tvFan"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/document_border_thick"
+                    android:id="@+id/rgFan">
+
+                    <RadioButton
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fan_low"
+                        android:textColor="@color/black"
+                        android:id="@+id/rbLow"/>
+
+                    <RadioButton
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fan_medium"
+                        android:textColor="@color/black"
+                        android:id="@+id/rbMedium"/>
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fan_high"
+                        android:textColor="@color/black"
+                        android:id="@+id/rbHigh"/>
+
+                </RadioGroup>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/rlLightControl">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="5dp"
+                    android:src="@drawable/_19___humidity_512"
+                    android:id="@+id/imgWater"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Temperature"
+                    android:layout_toEndOf="@id/imgWater"
+                    android:layout_toRightOf="@id/imgWater"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:textSize="20sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5"
+                    android:textColor="@color/humidity"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:layout_below="@id/imgWater"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="20dp"
+                    android:id="@+id/tvHumidity"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="LIGHT"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    android:layout_below="@id/tvHumidity"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="30dp"
+                    android:id="@+id/tvLight"
+                    android:layout_marginStart="30dp" />
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@id/tvLight"
+                    android:layout_toRightOf="@id/tvLight"
+                    android:layout_alignBottom="@id/tvLight"
+                    android:src="@drawable/__light_bulb_idea_creative_512" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/tvLight"
+                    android:layout_toRightOf="@id/tvLight"
+                    android:layout_marginLeft="140dp"
+                    android:layout_marginStart="140dp"
+                    android:layout_toEndOf="@id/tvLight"
+                    android:id="@+id/switchLight"/>
+            </RelativeLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

@@ -27,7 +27,8 @@
                 app:layout_constraintVertical_bias="0.2"
                 android:id="@+id/imgLivingRoom"
                 android:src="@drawable/sofa_seat_living_room_comfortable_256"
-                android:background="@android:drawable/dialog_holo_light_frame"/>
+                android:background="@drawable/document_shadow"
+                android:alpha="0.7"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -53,7 +54,8 @@
                 android:padding="10dp"
                 android:id="@+id/imgBedroom"
                 android:src="@drawable/bedroom_04_512"
-                android:background="@android:drawable/dialog_holo_light_frame"/>
+                android:background="@drawable/document_shadow"
+                android:alpha="0.7"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,7 +80,8 @@
                 android:padding="10dp"
                 android:id="@+id/imgKitchen"
                 android:src="@drawable/istar_design_interior_design_lineicons_live_23_512"
-                android:background="@android:drawable/dialog_holo_light_frame"/>
+                android:background="@drawable/document_shadow"
+                android:alpha="0.7"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -103,7 +106,8 @@
                 android:padding="10dp"
                 android:id="@+id/imgBathroom"
                 android:src="@drawable/istar_design_interior_design_lineicons_live_83_512"
-                android:background="@android:drawable/dialog_holo_light_frame"/>
+                android:background="@drawable/document_shadow"
+                android:alpha="0.7"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -138,9 +142,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:src="@drawable/back_1_512"
-                app:layout_constraintHorizontal_bias="0.1"
-                app:layout_constraintVertical_bias="0.05"
+                app:layout_constraintHorizontal_bias="0.02"
+                app:layout_constraintVertical_bias="0.02"
                 android:id="@+id/imgBackHome"/>
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/rlTemperature"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imgBackHome"
+                app:layout_constraintBottom_toTopOf="@id/rlTemperature"
+                app:layout_constraintHorizontal_bias="0"
+                android:spinnerMode="dropdown"
+                android:id="@+id/spinnerRoom"
+                android:background="@drawable/spinner"/>
 
             <RelativeLayout
                 android:layout_width="150dp"
@@ -149,20 +165,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.15"
+                app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintVertical_bias="0.35"
                 android:id="@+id/rlTemperature"
                 android:background="@android:drawable/dialog_holo_light_frame">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="5dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="3dp"
                     android:src="@drawable/thermometer_75_512"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="60dp"
+                    android:layout_marginTop="40dp"
                     android:layout_centerHorizontal="true"
                     android:text="Temperature"
                     android:textStyle="bold"
@@ -192,14 +208,14 @@
                 android:background="@android:drawable/dialog_holo_light_frame">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="5dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="3dp"
                     android:src="@drawable/summer_vacation_sun_sunlight_summer_heat_hot_512"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="60dp"
+                    android:layout_marginTop="40dp"
                     android:layout_centerHorizontal="true"
                     android:text="Light Intensity"
                     android:textStyle="bold"
@@ -220,23 +236,23 @@
             <RelativeLayout
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/rlTemperature"
+                app:layout_constraintEnd_toEndOf="@id/rlTemperature"
                 app:layout_constraintTop_toTopOf="@id/rlLightIntensity"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintHorizontal_bias="0.15"
+                app:layout_constraintHorizontal_bias="0"
                 android:id="@+id/rlHumidity"
                 android:background="@android:drawable/dialog_holo_light_frame">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="5dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="3dp"
                     android:src="@drawable/_19___humidity_512"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="60dp"
+                    android:layout_marginTop="40dp"
                     android:layout_centerHorizontal="true"
                     android:text="Humidity"
                     android:textStyle="bold"

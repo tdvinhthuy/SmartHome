@@ -1,6 +1,7 @@
 package com.example.smarthome.Activity;
 
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // setup view
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         tvDate = findViewById(R.id.tvDate);
 
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                         selectedFragment = new HomeFragment(room);
                         break;
                     case R.id.navControl:
-                        selectedFragment = new ControlFragment();
+                        selectedFragment = new ControlFragment(room);
                         break;
                     case R.id.navNotifications:
                         selectedFragment = new NotificationsFragment();

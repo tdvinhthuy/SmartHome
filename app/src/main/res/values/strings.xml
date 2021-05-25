@@ -1,8 +1,22 @@
 <resources>
+    <!--  App name  -->
     <string name="app_name">Smart Home</string>
+    <!--  Menu item  -->
     <string name="menu_home">Home</string>
     <string name="menu_control">Control</string>
     <string name="menu_notifications">History</string>
     <string name="menu_statistics">Statistics</string>
     <string name="menu_account">Account</string>
+    <!--  Room  -->
+    <string-array name="room_types">
+        <item>Living room</item>
+        <item>Bedroom</item>
+        <item>Kitchen</item>
+        <item>Bathroom</item>
+    </string-array>
+    <!-- Control -->
+    <string name="fan_low">Low</string>
+    <string name="fan_medium">Medium</string>
+    <string name="fan_high">High</string>
+
 </resources>

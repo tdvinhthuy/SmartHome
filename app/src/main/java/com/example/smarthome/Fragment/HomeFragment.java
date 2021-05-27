@@ -31,9 +31,9 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     private TextView tvHumidityRoom;
     private ImageView imgBackHome;
     private Spinner spinner;
+    private Room room;
     // data
-    private final FirebaseFirestore db;
-    private final Room room;
+    private FirebaseFirestore db;
     private RoomListener roomListener;
     public HomeFragment() {
         room = null;
@@ -41,22 +41,20 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     }
     public HomeFragment(Room room) {
         this.room = room;
-        db = FirebaseFirestore.getInstance();
         // load data
-        if (room != null) loadRoom();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = FirebaseFirestore.getInstance();
+        if (room != null) loadRoom();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        // load data
-        if (room != null) loadRoom();
         // SCREEN
         layoutHome = view.findViewById(R.id.layoutHome);
         layoutRoom = view.findViewById(R.id.layoutRoom);
@@ -72,28 +70,28 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
             @Override
             public void onClick(View v) {
                 Room room = new Room(Room.RoomType.LIVING_ROOM);
-                roomListener.onChange(room);
+                roomListener.onRoomChange(room, false);
             }
         });
         imgBedroom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Room room = new Room(Room.RoomType.BEDROOM);
-                roomListener.onChange(room);
+                roomListener.onRoomChange(room, false);
             }
         });
         imgKitchen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Room room = new Room(Room.RoomType.KITCHEN);
-                roomListener.onChange(room);
+                roomListener.onRoomChange(room, false);
             }
         });
         imgBathroom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Room room = new Room(Room.RoomType.BATHROOM);
-                roomListener.onChange(room);
+                roomListener.onRoomChange(room, false);
             }
         });
         // ROOM
@@ -104,13 +102,12 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         imgBackHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onChange(null);
+                roomListener.onRoomChange(null, false);
             }
         });
         // spinner
         spinner = view.findViewById(R.id.spinnerRoom);
         spinner.setOnItemSelectedListener(this);
-
         return view;
     }
 
@@ -122,9 +119,12 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                                         @Nullable FirebaseFirestoreException error) {
 
                         // get room names
-                        List<String> roomNames = new ArrayList<String>();
+                        List<String> roomNames = new ArrayList<>();
+                        if (!room.getName().equals("")) roomNames.add(room.getName());
                         for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            roomNames.add(document.getString("name"));
+                            if (!document.getString("name").equals(room.getName())) {
+                                roomNames.add(document.getString("name"));
+                            }
                         }
                         // create adapter for spinner
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -148,10 +148,14 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        roomListener.onChange(
-//                new Room(room.getType(),
-//                        parent.getItemAtPosition(position).toString())
-//        );
+        String roomName = parent.getItemAtPosition(position).toString();
+        if (!room.getName().equals(roomName)) {
+            roomListener.onRoomChange(
+                    new Room(room.getType(),
+                            parent.getItemAtPosition(position).toString()),
+                    false
+            );
+        }
     }
 
     @Override

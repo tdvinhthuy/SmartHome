@@ -4,8 +4,8 @@ import java.util.Locale;
 
 public class Room {
     public enum RoomType {LIVING_ROOM, BEDROOM, KITCHEN, BATHROOM}
-    private RoomType type;
-    private String name;
+    private final RoomType type;
+    private final String name;
 
     public Room() {
         type = null;

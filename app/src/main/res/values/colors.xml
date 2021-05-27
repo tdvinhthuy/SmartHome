@@ -28,4 +28,7 @@
     <color name="light_intensity">#DEDD11</color>
     <color name="humidity">#3C95FD</color>
     <color name="room_background">#F7F7F7</color>
+
+    <!-- notification page -->
+    <color name="dark_gray">#E5E5E5</color>
 </resources>

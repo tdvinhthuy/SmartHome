@@ -1,0 +1,4 @@
+com/example/smarthome/test/BuildConfig.java
+ com.example.smarthome.test.BuildConfig
+com/example/smarthome/ExampleInstrumentedTest.java
+ com.example.smarthome.ExampleInstrumentedTest

@@ -1,0 +1,2 @@
+com/example/smarthome/ExampleUnitTest.java
+ com.example.smarthome.ExampleUnitTest

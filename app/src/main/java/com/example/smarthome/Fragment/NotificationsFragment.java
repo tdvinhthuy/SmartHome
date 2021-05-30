@@ -31,12 +31,12 @@ public class NotificationsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         notificationList = new ArrayList<>();
+        loadNotification();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        loadNotification();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_notifications, container, false);
         recyclerView = view.findViewById(R.id.rvNotification);
@@ -59,12 +59,12 @@ public class NotificationsFragment extends Fragment {
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
                         if (querySnapshot == null || querySnapshot.isEmpty()) return;
                         for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            if (document.getString("userID").equals(mAuth.getUid())) {
+                            //if (document.getString("userID").equals(mAuth.getUid())) {
                                 NotificationItem item = document.toObject(NotificationItem.class);
                                 notificationList.add(item);
                                 Log.d("NOTIFICATION", notificationList.size() + " notifications");
-                                return;
-                            }
+                                //return;
+                            //}
                         }
                     }
                 });

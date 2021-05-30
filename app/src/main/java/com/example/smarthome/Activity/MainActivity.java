@@ -1,5 +1,6 @@
 package com.example.smarthome.Activity;
 
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,7 @@ import com.google.type.Date;
 import org.eclipse.paho.client.mqttv3.*;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.nio.charset.Charset;
 import java.util.Calendar;
@@ -36,9 +38,11 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     private Room room;
     private MQTTService mqttService;
     // topic
-    final String topicLight = "smarthomehcmut/feeds/light";
-    final String topicFan = "smarthomehcmut/feeds/fan";
-    //db
+    final String topicLight = "smarthomehcmut/feeds/bk-iot-led";
+    final String topicFan = "smarthomehcmut/feeds/bk-iot-traffic";
+    final String topicLightSensor = "CSE_BCC1/feeds/bk-iot-light";
+    final String topicTempHumidSensor = "CSE_BCC/feeds/bk-iot-temp-humid";
+    // db
     final FirebaseFirestore db = FirebaseFirestore.getInstance();
     final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     @Override
@@ -126,38 +130,81 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     @Override
     public void onLightChange(int state) {
         // MQTT send
-        String key = getDeviceKey(false);
-        String value = getDeviceValue(state, false);
-        String topic = getTopic(key);
-        JSONObject data = new JSONObject();
-        try {
-            data.put("key", key);
-            data.put("value", value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JSONObject data = getJSONData(state ,false);
+        String topic = topicLight;
         sendDataMQTT(data.toString(), topic);
-        writeDeviceState(value, false);
+        String lightState = state==0?"OFF":"ON";
+        writeDeviceState(lightState, false);
     }
 
     @Override
     public void onFanChange(int state) {
         // send MQTT
-        String key = getDeviceKey(true);
-        String value = getDeviceValue(state, true);
-        String topic = getTopic(key);
-        JSONObject data = new JSONObject();
-        try {
-            data.put("key", key);
-            data.put("value", value);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        JSONObject data = getJSONData(state ,false);
+        String topic = topicFan;
         sendDataMQTT(data.toString(), topic);
         // store to database
-        Map<String, Object> history = new HashMap<>();
         String fanState = state==0?"OFF":(state==1?"LOW":(state==2?"MEDIUM":"HIGH"));
         writeDeviceState(fanState, true);
+    }
+
+    @Override
+    public void onLightDataArrived(float data) {
+        db.collection("light_states")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        for (DocumentSnapshot document: querySnapshot.getDocuments()) {
+                            if (document.getString("room_name").equals(room.getName())) {
+                                // get state
+                                String state = document.getString("state");
+                                if (state.equals("OFF") && data < 100) {
+                                    // turn light ON
+                                    onLightChange(1);
+                                }
+                                else if (state.equals("ON") && data >= 100) {
+                                    // turn light OFF
+                                    onLightChange(0);
+                                }
+                                return;
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onTemperatureDataArrived(float data) {
+        db.collection("fan_states")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        for (DocumentSnapshot document: querySnapshot.getDocuments()) {
+                            if (document.getString("room_name").equals(room.getName())) {
+                                // get state
+                                String state = document.getString("state");
+                                if (state == null) return;
+                                if (!state.equals("OFF") && data <= 30) { // turn the Fan OFF
+                                    onFanChange(0);
+                                }
+                                if (!state.equals("HIGH") && data > 34) { // change Fan to HIGH
+                                    onFanChange(3);
+                                }
+                                else if (!state.equals("MEDIUM") && data > 32) { // change Fan to MEDIUM
+                                    onFanChange(2);
+                                }
+                                else if (!state.equals("LOW") && data > 30) { // change Fan to LOW
+                                    onFanChange(1);
+                                }
+                                return;
+                            }
+                        }
+                    }
+                });
     }
 
     private void writeDeviceState(String value, boolean isFan) {
@@ -208,49 +255,26 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 });
     }
 
-    private String getTopic(String key) {
-        return "smarthomehcmut/feeds/" + key;
-    }
-
-    private String getDeviceKey(boolean isFan) {
-        String roomName = room.getName().toLowerCase();
-        String key = "";
-        char index = roomName.charAt(roomName.length() - 1);
-        if (isFan) {
-            key += "fan-";
+    private JSONObject getJSONData(int state, boolean isFan) {
+        JSONObject jsonObject = new JSONObject();
+        String id = isFan?"6":"1";
+        String name = isFan?"TRAFFIC":"LED";
+        String data = Integer.toBinaryString(state);
+        String unit = "";
+        try {
+            jsonObject.put("id", id);
+            jsonObject.put("name", name);
+            jsonObject.put("data", data);
+            jsonObject.put("unit", unit);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        else {
-            key += "light-";
-        }
-        if (roomName.contains("living room")) {
-            key += "l-" + index;
-        }
-        else if (roomName.contains("bedroom")) {
-            key += "be-" + index;
-        }
-        else if (roomName.contains("kitchen")) {
-            key += "k-" + index;
-        }
-        else if (roomName.contains("bathroom")) {
-            key += "ba-" + index;
-        }
-        return key;
-    }
-
-    private String getDeviceValue(int state, boolean isFan) {
-        if (isFan) {
-            return String.valueOf(state);
-        }
-        else {
-            return (state == 0)?"OFF":"ON";
-        }
+        return jsonObject;
     }
 
     private void setupMqttService() {
         // MQTT Service
         mqttService = new MQTTService(this);
-        //mqttService.addTopic(topicLight);
-        //mqttService.addTopic(topicFan);
         mqttService.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -264,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
+                processMessage(message);
                 Log.d("Mqtt", topic + ": " + message.toString());
             }
 
@@ -274,6 +299,55 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         });
     }
 
+    private void processMessage(MqttMessage message) throws JSONException {
+        JSONObject jsonObject = new JSONObject(new String(message.getPayload()));
+        Float data = Float.valueOf(jsonObject.getString("data"));
+        if (jsonObject.get("name").equals("LIGHT")) { // light sensor
+            // store to db
+            writeSensorData(jsonObject);
+            // check light intensity
+            onLightDataArrived(data);
+        }
+        else if (jsonObject.get("name").equals("TEMP-HUMID")) { // temp-humid sensor
+            // store to db
+            writeSensorData(jsonObject);
+            // check temperature
+            onTemperatureDataArrived(data);
+        }
+    }
+
+    private void writeSensorData(JSONObject jsonObject) {
+        try {
+            String data = jsonObject.getString("data");
+            String sensor_name = jsonObject.getString("name");
+            String collection = sensor_name.equals("LIGHT")?"light_records":"temp_humid_records";
+            Map<String, Object> record = new HashMap<>();
+            if (sensor_name.equals("LIGHT")) {
+                record.put("data", data);
+            }
+            else {
+                String[] temp_humid = data.split("-");
+                record.put("temp_data", Float.valueOf(temp_humid[0]));
+                record.put("humid_data", Float.valueOf(temp_humid[1]));
+            }
+            record.put("timestamp", FieldValue.serverTimestamp());
+            db.collection("light_sensors")
+                    .add(record)
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                            if (task.isSuccessful()) {
+                                Log.d("LIGHT_SENSOR", "Write data success: " + record);
+                            }
+                            else {
+                                Log.d("LIGHT_SENSOR", "Write fail");
+                            }
+                        }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     private void sendDataMQTT(String data, String topic) {
         MqttMessage msg = new MqttMessage();
         msg.setId(1234);

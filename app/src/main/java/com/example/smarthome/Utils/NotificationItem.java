@@ -61,7 +61,7 @@ public class NotificationItem {
         + "at " + room_name + " "
         + "is " + (userID.equals("")?"automatically turned ":"turned ")
         + (metadata[1].equals("OFF")?"off":"on")
-        + (metadata[1].equals("ON")?"":"at mode " + metadata[1])
+        + (metadata[1].equals("ON")?"":" at mode " + metadata[1])
         + (userID.equals("")?"!":" by mobile app!");
     }
 

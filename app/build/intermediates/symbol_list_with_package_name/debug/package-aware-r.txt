@@ -1867,6 +1867,14 @@ id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
+id avgFanOpTimeText
+id avgFanOpTimeVal
+id avgLightIntenseText
+id avgLightIntenseVal
+id avgLightOpTimeText
+id avgLightOpTimeVal
+id avgTempText
+id avgTempVal
 id barrier
 id baseline
 id beginOnFirstDraw
@@ -1981,10 +1989,8 @@ id floating
 id forever
 id fragmentContainer
 id fragment_container_view_tag
-id fromDate
 id ghost_view
 id ghost_view_holder
-id goButton
 id gone
 id graph
 id graph_wrap
@@ -2005,6 +2011,7 @@ id ignore
 id ignoreRequest
 id image
 id imgBackHome
+id imgBackStatistic
 id imgBathroom
 id imgBedroom
 id imgKitchen
@@ -2025,7 +2032,6 @@ id largeLabel
 id layout
 id layoutHome
 id layoutRoom
-id layoutStatisticGen
 id left
 id leftToRight
 id light
@@ -2123,7 +2129,6 @@ id postLayout
 id progress_circular
 id progress_horizontal
 id radio
-id rangeTitle
 id ratio
 id rbHigh
 id rbLow
@@ -2140,6 +2145,7 @@ id rlHumidity
 id rlLightControl
 id rlLightIntensity
 id rlTemperature
+id roomOption
 id rounded
 id row_index_key
 id rvNotification
@@ -2182,7 +2188,6 @@ id spacer
 id special_effects_controller_view_tag
 id spinnerRoom
 id spinnerRoomControl
-id spinnerRoomStatistic
 id spline
 id split_action_bar
 id spread
@@ -2198,7 +2203,8 @@ id startToEnd
 id startVertical
 id staticLayout
 id staticPostLayout
-id statisticTitle
+id statisticOption
+id statisticSpec
 id status_bar_latest_event_content
 id stop
 id stretch
@@ -2240,15 +2246,10 @@ id textinput_helper_text
 id textinput_placeholder
 id textinput_prefix_text
 id textinput_suffix_text
-id thisMonthOption
-id thisWeekOption
 id time
 id title
 id titleDividerNoCustom
 id title_template
-id toDate
-id toText
-id todayOption
 id toggle
 id top
 id topPanel
@@ -2293,7 +2294,6 @@ id uniform
 id unlabeled
 id up
 id useLogo
-id verticalGuidLine
 id view_offset_helper
 id view_tree_lifecycle_owner
 id view_tree_saved_state_registry_owner
@@ -2305,7 +2305,6 @@ id withText
 id withinBounds
 id wrap
 id wrap_content
-id yesterdayOption
 id zero_corner_chip
 integer abc_config_activityDefaultDur
 integer abc_config_activityShortDur

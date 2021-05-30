@@ -1867,14 +1867,6 @@ id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
-id avgFanOpTimeText
-id avgFanOpTimeVal
-id avgLightIntenseText
-id avgLightIntenseVal
-id avgLightOpTimeText
-id avgLightOpTimeVal
-id avgTempText
-id avgTempVal
 id barrier
 id baseline
 id beginOnFirstDraw
@@ -1991,6 +1983,7 @@ id fragmentContainer
 id fragment_container_view_tag
 id ghost_view
 id ghost_view_holder
+id goButton
 id gone
 id graph
 id graph_wrap
@@ -2011,7 +2004,6 @@ id ignore
 id ignoreRequest
 id image
 id imgBackHome
-id imgBackStatistic
 id imgBathroom
 id imgBedroom
 id imgKitchen
@@ -2032,6 +2024,7 @@ id largeLabel
 id layout
 id layoutHome
 id layoutRoom
+id layoutStatisticGen
 id left
 id leftToRight
 id light
@@ -2145,7 +2138,6 @@ id rlHumidity
 id rlLightControl
 id rlLightIntensity
 id rlTemperature
-id roomOption
 id rounded
 id row_index_key
 id rvNotification
@@ -2188,6 +2180,7 @@ id spacer
 id special_effects_controller_view_tag
 id spinnerRoom
 id spinnerRoomControl
+id spinnerRoomStatistic
 id spline
 id split_action_bar
 id spread
@@ -2203,8 +2196,6 @@ id startToEnd
 id startVertical
 id staticLayout
 id staticPostLayout
-id statisticOption
-id statisticSpec
 id status_bar_latest_event_content
 id stop
 id stretch
@@ -2250,6 +2241,7 @@ id time
 id title
 id titleDividerNoCustom
 id title_template
+id toText
 id toggle
 id top
 id topPanel
@@ -2289,11 +2281,20 @@ id tvSignUpError
 id tvSignUpTitle
 id tvTemperature
 id tvTemperatureRoom
+id tv_fromDate
+id tv_rangeTitle
+id tv_statisticTitle
+id tv_thisMonthOption
+id tv_thisWeekOption
+id tv_toDate
+id tv_todayOption
+id tv_yesterdayOption
 id unchecked
 id uniform
 id unlabeled
 id up
 id useLogo
+id verticalGuidLine
 id view_offset_helper
 id view_tree_lifecycle_owner
 id view_tree_saved_state_registry_owner

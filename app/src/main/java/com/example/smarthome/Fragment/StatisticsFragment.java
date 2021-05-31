@@ -23,8 +23,8 @@ public class StatisticsFragment extends Fragment {
 
     TextView tvFromDate;
     TextView tvToDate;
-    DatePickerDialog.OnDateSetListener setListener1;
-    DatePickerDialog.OnDateSetListener setListener2;
+    DatePickerDialog.OnDateSetListener setListenerFromDate;
+    DatePickerDialog.OnDateSetListener setListenerToDate;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class StatisticsFragment extends Fragment {
             public void onClick(View v) {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                         android.R.style.Theme_DeviceDefault,
-                        setListener1,
+                        setListenerFromDate,
                         year,
                         month,
                         day);
@@ -58,7 +58,7 @@ public class StatisticsFragment extends Fragment {
             public void onClick(View v) {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                         android.R.style.Theme_DeviceDefault,
-                        setListener2,
+                        setListenerToDate,
                         year,
                         month,
                         day);
@@ -67,7 +67,7 @@ public class StatisticsFragment extends Fragment {
             }
         });
 
-        setListener1 = new DatePickerDialog.OnDateSetListener() {
+        setListenerFromDate = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 month = month + 1;
@@ -75,7 +75,7 @@ public class StatisticsFragment extends Fragment {
                 tvFromDate.setText(date);
             }
         };
-        setListener2 = new DatePickerDialog.OnDateSetListener() {
+        setListenerToDate = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 month = month + 1;

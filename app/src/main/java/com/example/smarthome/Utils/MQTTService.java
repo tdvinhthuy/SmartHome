@@ -9,15 +9,22 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class MQTTService {
-    final String serverUri = "tcp://io.adafruit.com:1883";
-    final String clientID = "";
-    final String username = "smarthomehcmut";
-    final String password = "aio_yPRQ24NT0LXN6itBeH9yBa00MhVz";
+    private String serverUri = "tcp://io.adafruit.com:1883";
+    private String clientID = "";
+    private String username = "smarthomehcmut";
+    private String password = "aio_yPRQ24NT0LXN6itBeH9yBa00MhVz";
+    private final String topicLightSensor = "CSE_BBC1/feeds/bk-iot-light";
+    private final String topicTempHumidSensor = "CSE_BBC/feeds/bk-iot-temp-humid";
     private ArrayList<String> topics;
     public MqttAndroidClient mqttAndroidClient;
 
     public MQTTService(Context context) {
+        // subscribed topics
         topics = new ArrayList<>();
+        topics.add(topicLightSensor);
+        topics.add(topicTempHumidSensor);
+
+        // mqtt client
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientID);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
@@ -64,7 +71,7 @@ public class MQTTService {
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
 
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    //subscribeToTopic();
+                    subscribeToTopic();
                 }
 
                 @Override
@@ -95,10 +102,6 @@ public class MQTTService {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void addTopic(String topic) {
-        topics.add(topic);
     }
 
     public void setCallback(MqttCallbackExtended callback) {

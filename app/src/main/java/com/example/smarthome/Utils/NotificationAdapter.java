@@ -9,11 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.smarthome.R;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 import java.util.ArrayList;
 
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
-    private ArrayList<NotificationItem> notificationList;
+public class NotificationAdapter extends FirestoreRecyclerAdapter<NotificationItem, NotificationAdapter.NotificationViewHolder> {
 
     public static class NotificationViewHolder extends RecyclerView.ViewHolder {
         private ImageView imageView;
@@ -29,24 +30,22 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
-    public NotificationAdapter(ArrayList<NotificationItem> notificationList) {
-        this.notificationList = notificationList;
+    public NotificationAdapter(@NonNull FirestoreRecyclerOptions<NotificationItem> options) {
+        super(options);
     }
 
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_item, parent, false);
-        NotificationViewHolder viewHolder = new NotificationViewHolder(view);
-        return viewHolder;
+        return new NotificationViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
-        NotificationItem currentItem = notificationList.get(position);
+    public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position, @NonNull NotificationItem item) {
         // imageView
         int imgSrc = R.drawable.ic_launcher_foreground;
-        switch (currentItem.getNotificationType()) {
+        switch (item.getNotificationType()) {
             case LIGHT_ON:
                 imgSrc = R.drawable.light_on;
                 break;
@@ -64,13 +63,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
         holder.imageView.setImageResource(imgSrc);
         // tvContent
-        holder.tvContent.setText(currentItem.getContent());
+        holder.tvContent.setText(item.getContent());
         // tvTime
-        holder.tvTime.setText(currentItem.getStringTime());
-    }
-
-    @Override
-    public int getItemCount() {
-        return notificationList.size();
+        holder.tvTime.setText(item.getStringTime());
     }
 }

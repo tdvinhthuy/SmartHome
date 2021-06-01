@@ -409,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(title)
-                .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE);
 
@@ -439,4 +439,5 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                     }
                 });
     }
+
 }

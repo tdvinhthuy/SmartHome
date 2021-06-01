@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.smarthome.R;
 import com.example.smarthome.Utils.NotificationAdapter;
 import com.example.smarthome.Utils.NotificationItem;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -21,20 +22,30 @@ import java.util.ArrayList;
 
 
 public class NotificationsFragment extends Fragment {
-    private ArrayList<NotificationItem> notificationList;
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
     private FirebaseFirestore db;
+    private CollectionReference notificationRef;
+    private NotificationAdapter adapter;
     private FirebaseAuth mAuth;
+    private RecyclerView recyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
+        notificationRef = db.collection("notifications");
         mAuth = FirebaseAuth.getInstance();
-        notificationList = new ArrayList<>();
-        loadNotification();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 
     @Override
@@ -43,32 +54,20 @@ public class NotificationsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_notifications, container, false);
         recyclerView = view.findViewById(R.id.rvNotification);
-        //recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getActivity());
-        adapter = new NotificationAdapter(notificationList);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
-
+        setupAdapter();
         return view;
     }
 
-    private void loadNotification() {
-        db.collection("notifications")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        // notification view
-                        for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            //if (document.getString("userID").equals(mAuth.getUid())) {
-                                NotificationItem item = document.toObject(NotificationItem.class);
-                                notificationList.add(item);
-                                Log.d("NOTIFICATION", notificationList.size() + " notifications");
-                                //return;
-                            //}
-                        }
-                    }
-                });
+    private void setupAdapter() {
+        Query query = notificationRef.orderBy("timestamp", Query.Direction.DESCENDING);
+
+        FirestoreRecyclerOptions<NotificationItem> options = new FirestoreRecyclerOptions.Builder<NotificationItem>()
+                .setQuery(query, NotificationItem.class)
+                .build();
+
+        adapter = new NotificationAdapter(options);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(adapter);
     }
 }

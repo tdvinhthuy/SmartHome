@@ -1,9 +1,5 @@
 package com.example.smarthome.Utils;
 
-import com.google.firebase.firestore.FieldValue;
-
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -70,7 +66,7 @@ public class NotificationItem {
                 "May", "Jun", "Jul", "Aug",
                 "Sep", "Oct", "Nov", "Dec"};
         Calendar cal = Calendar.getInstance();
-        cal.setTime(timestamp);
+        if (timestamp != null) cal.setTime(timestamp);
         String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
         String minute = String.valueOf(cal.get(Calendar.MINUTE));
         hour = hour.length() == 1?'0'+ hour:hour;

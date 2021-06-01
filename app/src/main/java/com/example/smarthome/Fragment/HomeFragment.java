@@ -158,7 +158,7 @@ public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelect
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null && querySnapshot.isEmpty()) return;
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
                         tvLightIntensityRoom.setText(String.format("%s lux", document.getString("data")));
                     }

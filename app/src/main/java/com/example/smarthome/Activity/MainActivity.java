@@ -139,25 +139,25 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
      */
 
     @Override
-    public void onLightChange(int state) {
+    public void onLightChange(int state, boolean bAuto) {
         // MQTT send
         JSONObject data = getJSONData(state ,false);
         String topic = topicLight;
         sendDataMQTT(data.toString(), topic);
         // store to database
         String lightState = state==0?"OFF":"ON";
-        writeDeviceState(lightState, false);
+        writeDeviceState(lightState, false, bAuto);
     }
 
     @Override
-    public void onFanChange(int state) {
+    public void onFanChange(int state, boolean bAuto) {
         // send MQTT
         JSONObject data = getJSONData(state ,true);
         String topic = topicFan;
         sendDataMQTT(data.toString(), topic);
         // store to database
         String fanState = state==0?"OFF":(state==1?"LOW":(state==2?"MEDIUM":"HIGH"));
-        writeDeviceState(fanState, true);
+        writeDeviceState(fanState, true, bAuto);
     }
 
     @Override
@@ -177,12 +177,12 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                                 String state = document.getString("state");
                                 if (state.equals("OFF") && data < 100) {
                                     // turn light ON
-                                    onLightChange(1);
+                                    onLightChange(1, true);
                                     Log.d("LIGHT_STATE", "Automatically turned ON!");
                                 }
                                 else if (state.equals("ON") && data >= 100) {
                                     // turn light OFF
-                                    onLightChange(0);
+                                    onLightChange(0, true);
                                     Log.d("LIGHT_STATE", "Automatically turned OFF!");
                                 }
                             //}
@@ -208,16 +208,16 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                                     String state = document.getString("state");
                                     if (state == null) return;
                                     if (!state.equals("OFF") && data <= 30) { // turn the Fan OFF
-                                        onFanChange(0);
+                                        onFanChange(0, true);
                                     }
                                     if (!state.equals("HIGH") && data > 34) { // change Fan to HIGH
-                                        onFanChange(3);
+                                        onFanChange(3, true);
                                     }
                                     else if (!state.equals("MEDIUM") && data > 32) { // change Fan to MEDIUM
-                                        onFanChange(2);
+                                        onFanChange(2, true);
                                     }
                                     else if (!state.equals("LOW") && data > 30) { // change Fan to LOW
-                                        onFanChange(1);
+                                        onFanChange(1, true);
                                     }
                                     return;
                                 //}
@@ -227,8 +227,8 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 });
     }
 
-    private void writeDeviceState(String value, boolean isFan) {
-        String userID = mAuth.getUid();
+    private void writeDeviceState(String value, boolean isFan, boolean bAuto) {
+        String userID = bAuto?"":mAuth.getUid();
         FieldValue timestamp = FieldValue.serverTimestamp();
         // store to device collection
         Map<String, Object> history = new HashMap<>();

@@ -67,4 +67,14 @@ public class NotificationAdapter extends FirestoreRecyclerAdapter<NotificationIt
         // tvTime
         holder.tvTime.setText(item.getStringTime());
     }
+
+    public void deleteItem(int position) {
+        getSnapshots().getSnapshot(position).getReference().delete();
+    }
+
+    public void deleteAll() {
+        for (int i = getItemCount() - 1; i > -1; i--) {
+            deleteItem(i);
+        }
+    }
 }

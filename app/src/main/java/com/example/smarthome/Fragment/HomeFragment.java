@@ -48,7 +48,6 @@ public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelect
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
 //        if (room != null) loadRoom();
-        loadData();
     }
 
     @Override
@@ -112,6 +111,8 @@ public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelect
         // spinner
 //        spinner = view.findViewById(R.id.spinnerRoom);
 //        spinner.setOnItemSelectedListener(this);
+
+        loadData();
         return view;
     }
 

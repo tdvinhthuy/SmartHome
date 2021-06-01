@@ -52,7 +52,7 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
         lightListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                roomListener.onLightChange(isChecked?1:0);
+                roomListener.onLightChange(isChecked?1:0, false);
             }
         };
         fanListener = new CompoundButton.OnCheckedChangeListener() {
@@ -63,11 +63,11 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
                 }
                 if (isChecked) {
                     rbLow.setChecked(true);
-                    roomListener.onFanChange(1);
+                    roomListener.onFanChange(1, false);
                 }
                 if (!isChecked) {
                     rgFan.clearCheck();
-                    roomListener.onFanChange(0);
+                    roomListener.onFanChange(0, false);
                 }
             }
         };
@@ -112,19 +112,19 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
         rbLow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(1);
+                roomListener.onFanChange(1, false);
             }
         });
         rbMedium.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(2);
+                roomListener.onFanChange(2, false);
             }
         });
         rbHigh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(3);
+                roomListener.onFanChange(3, false);
             }
         });
 

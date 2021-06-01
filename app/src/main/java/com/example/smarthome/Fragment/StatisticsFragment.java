@@ -114,12 +114,12 @@ public class StatisticsFragment extends Fragment {
         String[] fromDate = tvFromDate.getText().toString().split("/");
         String[] toDate = tvToDate.getText().toString().split("/");
 
-        int fromYear = Integer.valueOf(fromDate[2]);
-        int fromMonth = Integer.valueOf(fromDate[1]);
-        int fromDay = Integer.valueOf(fromDate[0]);
-        int toYear = Integer.valueOf(toDate[2]);
-        int toMonth = Integer.valueOf(toDate[1]);
-        int toDay = Integer.valueOf(toDate[0]);
+        int fromYear = Integer.parseInt(fromDate[2]);
+        int fromMonth = Integer.parseInt(fromDate[1]);
+        int fromDay = Integer.parseInt(fromDate[0]);
+        int toYear = Integer.parseInt(toDate[2]);
+        int toMonth = Integer.parseInt(toDate[1]);
+        int toDay = Integer.parseInt(toDate[0]);
 
         if (fromYear > toYear) return false;
         if (fromYear == toYear && fromMonth > toMonth) return false;

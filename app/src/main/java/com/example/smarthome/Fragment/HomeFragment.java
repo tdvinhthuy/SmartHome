@@ -18,7 +18,7 @@ import com.google.firebase.firestore.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelectedListener*/ {
     private View layoutHome, layoutRoom;
     // Home
     private ImageView imgLivingRoom;
@@ -35,20 +35,20 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     // data
     private FirebaseFirestore db;
     private RoomListener roomListener;
-    public HomeFragment() {
-        room = null;
-        db = FirebaseFirestore.getInstance();
-    }
-    public HomeFragment(Room room) {
-        this.room = room;
-        // load data
-    }
+//    public HomeFragment() {
+//        room = null;
+//    }
+//    public HomeFragment(Room room) {
+//        this.room = room;
+//        // load data
+//    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
-        if (room != null) loadRoom();
+//        if (room != null) loadRoom();
+        loadData();
     }
 
     @Override
@@ -56,11 +56,12 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         // SCREEN
-        layoutHome = view.findViewById(R.id.layoutHome);
+        //layoutHome = view.findViewById(R.id.layoutHome);
         layoutRoom = view.findViewById(R.id.layoutRoom);
-        layoutHome.setVisibility(room == null? View.VISIBLE: View.GONE);
-        layoutRoom.setVisibility(room != null? View.VISIBLE: View.GONE);
+        //layoutHome.setVisibility(room == null? View.VISIBLE: View.GONE);
+        //layoutRoom.setVisibility(room != null? View.VISIBLE: View.GONE);
         // HOME
+        /*
         imgLivingRoom = view.findViewById(R.id.imgLivingRoom);
         imgBedroom = view.findViewById(R.id.imgBedroom);
         imgKitchen = view.findViewById(R.id.imgKitchen);
@@ -94,10 +95,12 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 roomListener.onRoomChange(room, false);
             }
         });
+         */
         // ROOM
         tvTemperatureRoom = view.findViewById(R.id.tvTemperatureRoom);
         tvLightIntensityRoom = view.findViewById(R.id.tvLightIntensityRoom);
         tvHumidityRoom = view.findViewById(R.id.tvHumidityRoom);
+        /*
         imgBackHome = view.findViewById(R.id.imgBackHome);
         imgBackHome.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,9 +108,10 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
                 roomListener.onRoomChange(null, false);
             }
         });
+        */
         // spinner
-        spinner = view.findViewById(R.id.spinnerRoom);
-        spinner.setOnItemSelectedListener(this);
+//        spinner = view.findViewById(R.id.spinnerRoom);
+//        spinner.setOnItemSelectedListener(this);
         return view;
     }
 
@@ -146,6 +150,22 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
         }
     }
 
+
+    private void loadData() {
+        // Light intensity
+        db.collection("light_records")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null && querySnapshot.isEmpty()) return;
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        tvLightIntensityRoom.setText(String.format("%s lux", document.getString("data")));
+                    }
+                });
+    }
+
+    /*
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String roomName = parent.getItemAtPosition(position).toString();
@@ -162,4 +182,5 @@ public class HomeFragment extends Fragment implements AdapterView.OnItemSelected
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+    */
 }

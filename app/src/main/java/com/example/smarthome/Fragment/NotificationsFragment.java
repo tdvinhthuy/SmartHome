@@ -1,7 +1,9 @@
 package com.example.smarthome.Fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
 import java.util.ArrayList;
+
 
 public class NotificationsFragment extends Fragment {
     private ArrayList<NotificationItem> notificationList;
@@ -43,13 +46,11 @@ public class NotificationsFragment extends Fragment {
         //recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         adapter = new NotificationAdapter(notificationList);
-
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
         return view;
     }
-
 
     private void loadNotification() {
         db.collection("notifications")
@@ -58,6 +59,7 @@ public class NotificationsFragment extends Fragment {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
                         if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        // notification view
                         for (DocumentSnapshot document: querySnapshot.getDocuments()) {
                             //if (document.getString("userID").equals(mAuth.getUid())) {
                                 NotificationItem item = document.toObject(NotificationItem.class);

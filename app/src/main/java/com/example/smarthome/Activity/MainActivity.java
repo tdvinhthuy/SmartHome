@@ -1,5 +1,9 @@
 package com.example.smarthome.Activity;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.os.Build;
+import android.service.notification.NotificationListenerService;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.MenuItem;
@@ -9,12 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import com.example.smarthome.Fragment.*;
 import com.example.smarthome.R;
-import com.example.smarthome.Utils.MQTTService;
-import com.example.smarthome.Utils.Room;
-import com.example.smarthome.Utils.RoomListener;
+import com.example.smarthome.Utils.*;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -35,16 +39,16 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements RoomListener {
     private TextView tvDate;
-    private Room room;
+    //private Room room;
     private MQTTService mqttService;
     // topic
     final String topicLight = "smarthomehcmut/feeds/bk-iot-led";
     final String topicFan = "smarthomehcmut/feeds/bk-iot-traffic";
-    final String topicLightSensor = "CSE_BCC1/feeds/bk-iot-light";
-    final String topicTempHumidSensor = "CSE_BCC/feeds/bk-iot-temp-humid";
     // db
     final FirebaseFirestore db = FirebaseFirestore.getInstance();
     final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    // notification
+    final String CHANNEL_ID = "NOTIFICATION";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +59,10 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         tvDate = findViewById(R.id.tvDate);
         // room
-        room = null;
+        //room = null;
+        // notification
+        createNotificationChannel();
+        listenToNotification();
         // set date
         setDate();
         // fragment
@@ -70,10 +77,12 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 Fragment selectedFragment = null;
                 switch (item.getItemId()) {
                     case R.id.navHome:
-                        selectedFragment = new HomeFragment(room);
+//                        selectedFragment = new HomeFragment(room);
+                        selectedFragment = new HomeFragment();
                         break;
                     case R.id.navControl:
-                        selectedFragment = new ControlFragment(room);
+//                        selectedFragment = new ControlFragment(room);
+                        selectedFragment = new ControlFragment();
                         break;
                     case R.id.navNotifications:
                         selectedFragment = new NotificationsFragment();
@@ -110,9 +119,10 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 cal.get(Calendar.YEAR)));
     }
 
+    /*
     @Override
     public void onRoomChange(Room room, boolean control) {
-        this.room = room;
+        //this.room = room;
         Fragment fragment;
         if (control) {
             fragment = new ControlFragment(room);
@@ -126,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 .replace(R.id.fragmentContainer, fragment)
                 .commitNow();
     }
+     */
 
     @Override
     public void onLightChange(int state) {
@@ -133,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         JSONObject data = getJSONData(state ,false);
         String topic = topicLight;
         sendDataMQTT(data.toString(), topic);
+        // store to database
         String lightState = state==0?"OFF":"ON";
         writeDeviceState(lightState, false);
     }
@@ -140,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     @Override
     public void onFanChange(int state) {
         // send MQTT
-        JSONObject data = getJSONData(state ,false);
+        JSONObject data = getJSONData(state ,true);
         String topic = topicFan;
         sendDataMQTT(data.toString(), topic);
         // store to database
@@ -152,24 +164,28 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     public void onLightDataArrived(float data) {
         db.collection("light_states")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            if (document.getString("room_name").equals(room.getName())) {
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot querySnapshot = task.getResult();
+                            if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                            DocumentSnapshot document =  querySnapshot.getDocuments().get(0);
+                            //if (document.getString("room_name").equals(room.getName())) {
                                 // get state
                                 String state = document.getString("state");
                                 if (state.equals("OFF") && data < 100) {
                                     // turn light ON
                                     onLightChange(1);
+                                    Log.d("LIGHT_STATE", "Automatically turned ON!");
                                 }
                                 else if (state.equals("ON") && data >= 100) {
                                     // turn light OFF
                                     onLightChange(0);
+                                    Log.d("LIGHT_STATE", "Automatically turned OFF!");
                                 }
-                                return;
-                            }
+                            //}
                         }
                     }
                 });
@@ -179,28 +195,32 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     public void onTemperatureDataArrived(float data) {
         db.collection("fan_states")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            if (document.getString("room_name").equals(room.getName())) {
-                                // get state
-                                String state = document.getString("state");
-                                if (state == null) return;
-                                if (!state.equals("OFF") && data <= 30) { // turn the Fan OFF
-                                    onFanChange(0);
-                                }
-                                if (!state.equals("HIGH") && data > 34) { // change Fan to HIGH
-                                    onFanChange(3);
-                                }
-                                else if (!state.equals("MEDIUM") && data > 32) { // change Fan to MEDIUM
-                                    onFanChange(2);
-                                }
-                                else if (!state.equals("LOW") && data > 30) { // change Fan to LOW
-                                    onFanChange(1);
-                                }
-                                return;
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot querySnapshot = task.getResult();
+                            if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                            for (DocumentSnapshot document: querySnapshot.getDocuments()) {
+                                //if (document.getString("room_name").equals(room.getName())) {
+                                    // get state
+                                    String state = document.getString("state");
+                                    if (state == null) return;
+                                    if (!state.equals("OFF") && data <= 30) { // turn the Fan OFF
+                                        onFanChange(0);
+                                    }
+                                    if (!state.equals("HIGH") && data > 34) { // change Fan to HIGH
+                                        onFanChange(3);
+                                    }
+                                    else if (!state.equals("MEDIUM") && data > 32) { // change Fan to MEDIUM
+                                        onFanChange(2);
+                                    }
+                                    else if (!state.equals("LOW") && data > 30) { // change Fan to LOW
+                                        onFanChange(1);
+                                    }
+                                    return;
+                                //}
                             }
                         }
                     }
@@ -212,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         FieldValue timestamp = FieldValue.serverTimestamp();
         // store to device collection
         Map<String, Object> history = new HashMap<>();
-        history.put("room_name", room.getName());
+        //history.put("room_name", room.getName());
         history.put("state", value);
         history.put("timestamp", timestamp);
         history.put("userID", userID);
@@ -235,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         notificationType = notificationType + (isFan ? "FAN_" : "LIGHT_");
         notificationType = notificationType + value;
         Map<String, Object> notification = new HashMap<>();
-        notification.put("room_name", room.getName());
+        //notification.put("room_name", room.getName());
         notification.put("type", notificationType);
         notification.put("timestamp", timestamp);
         notification.put("userID", userID);
@@ -260,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         String id = isFan?"6":"1";
         String name = isFan?"TRAFFIC":"LED";
         String data = Integer.toBinaryString(state);
+        if (data.length() == 1) data = '0' + data;
         String unit = "";
         try {
             jsonObject.put("id", id);
@@ -289,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 processMessage(message);
-                Log.d("Mqtt", topic + ": " + message.toString());
+                Log.d("Mqtt_receive", topic + ": " + message.toString());
             }
 
             @Override
@@ -331,16 +352,16 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 record.put("humid_data", Float.valueOf(temp_humid[1]));
             }
             record.put("timestamp", FieldValue.serverTimestamp());
-            db.collection("light_sensors")
+            db.collection(collection)
                     .add(record)
                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {
                             if (task.isSuccessful()) {
-                                Log.d("LIGHT_SENSOR", "Write data success: " + record);
+                                Log.d("SENSOR", "Write data success: " + record);
                             }
                             else {
-                                Log.d("LIGHT_SENSOR", "Write fail");
+                                Log.d("SENSOR", "Write fail");
                             }
                         }
                     });
@@ -365,5 +386,57 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    // notification
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Notification Channel";
+            String description = "This is notification channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void sendOnChannel(String title, String text) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(0, builder.build());
+    }
+
+    private void listenToNotification() {
+        db.collection("notifications")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        // notification view
+                        // system notification
+                        for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
+                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                                Log.d("NOTIFICATION", "New notification!");
+                                NotificationItem item = dc.getDocument().toObject(NotificationItem.class);
+                                String title = item.getType().replace("_", " ").toUpperCase();
+                                String text = item.getContent();
+                                sendOnChannel(title, text);
+                            }
+                        }
+                    }
+                });
     }
 }

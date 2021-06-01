@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ControlFragment extends Fragment implements AdapterView.OnItemSelectedListener {
-    private Room room;
+public class ControlFragment extends Fragment /*implements AdapterView.OnItemSelectedListener*/ {
+    //private Room room;
     private Spinner spinner;
     private RadioGroup rgFan;
     private RadioButton rbLow;
@@ -38,12 +38,12 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
     private CompoundButton.OnCheckedChangeListener lightListener;
     private CompoundButton.OnCheckedChangeListener fanListener;
     private ArrayAdapter<String> adapter;
-    public ControlFragment() {
-        room = null;
-    }
-    public ControlFragment(Room room) {
-        this.room = room;
-    }
+//    public ControlFragment() {
+//        room = null;
+//    }
+//    public ControlFragment(Room room) {
+//        this.room = room;
+//    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,11 +72,13 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
             }
         };
         // load data
-        if (room != null) {
-            loadRoom();
-            loadLight();
-            loadFan();
-        }
+//        if (room != null) {
+//            loadRoom();
+//            loadLight();
+//            loadFan();
+//        }
+        loadLight();
+        loadFan();
     }
 
     @Override
@@ -85,21 +87,21 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_control, container, false);
         // spinner
-        spinner = view.findViewById(R.id.spinnerRoomControl);
-        spinner.setOnItemSelectedListener(this);
+        //spinner = view.findViewById(R.id.spinnerRoomControl);
+        //spinner.setOnItemSelectedListener(this);
         // light
         switchLight = view.findViewById(R.id.switchLight);
-        if (room == null) switchLight.setEnabled(false);
+        //if (room == null) switchLight.setEnabled(false);
         switchLight.setOnCheckedChangeListener(lightListener);
         // fan
         switchFan = view.findViewById(R.id.switchFan);
         rgFan = view.findViewById(R.id.rgFan);
-        if (room == null) {
-            switchFan.setEnabled(false);
-            for (int i = 0; i < rgFan.getChildCount(); i++) {
-                rgFan.getChildAt(i).setEnabled(false);
-            }
-        }
+//        if (room == null) {
+//            switchFan.setEnabled(false);
+//            for (int i = 0; i < rgFan.getChildCount(); i++) {
+//                rgFan.getChildAt(i).setEnabled(false);
+//            }
+//        }
         // get radio button
         rbLow = view.findViewById(R.id.rbLow);
         rbMedium = view.findViewById(R.id.rbMedium);
@@ -148,15 +150,15 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
                             return;
                         }
                         for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            if (document.getString("room_name").equals(room.getName())) {
+                            //if (document.getString("room_name").equals(room.getName())) {
                                 String state = document.getString("state");
                                 switchLight.setOnCheckedChangeListener(null);
                                 switchLight.setChecked(state.equals("ON"));
                                 switchLight.setOnCheckedChangeListener(lightListener);
                                 Log.d("LIGHT_STATE", "Load light state success:"
-                                        + room.getName() + " " + state);
+                                        + /*room.getName() + */" " + state);
                                 return;
-                            }
+                            //}
                         }
                     }
                 });
@@ -172,7 +174,7 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
                     return;
                 }
                 for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                    if (document.getString("room_name").equals(room.getName())) {
+                    //if (document.getString("room_name").equals(room.getName())) {
                         String state = document.getString("state");
                         if (state.equals("OFF")) {
                             switchFan.setOnCheckedChangeListener(null);
@@ -198,14 +200,15 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
                                     break;
                             }
                         }
-                        Log.d("FAN_STATE", "Load fan state success: " + room.getName() + " " + state);
+                        Log.d("FAN_STATE", "Load fan state success: " /*+ room.getName()*/ + " " + state);
                         return;
-                    }
+                    //}
                 }
             }
         });
     }
 
+    /*
     private void loadRoom() {
         db.collection("rooms").whereEqualTo("type", room.getStringType())
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -247,4 +250,6 @@ public class ControlFragment extends Fragment implements AdapterView.OnItemSelec
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+     */
 }

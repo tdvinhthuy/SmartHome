@@ -16,27 +16,27 @@ public class NotificationItem {
         FAN_MEDIUM,
         FAN_HIGH
     }
-    private String room_name;
+//    private String room_name;
     private String type;
     private Date timestamp;
     private String userID;
 
     public NotificationItem() {
-        this.room_name = "";
+//        this.room_name = "";
         this.type = "";
         this.timestamp = null;
         this.userID = "";
     }
-    public NotificationItem(String room_name, String type, Date timestamp, String userID) {
+    public NotificationItem(/*String room_name,*/ String type, Date timestamp, String userID) {
         this.type = type;
-        this.room_name = room_name;
+//        this.room_name = room_name;
         this.timestamp = timestamp;
         this.userID = userID;
     }
 
-    public String getRoom_name() {
-        return room_name;
-    }
+//    public String getRoom_name() {
+//        return room_name;
+//    }
 
     public String getType() {
         return type;
@@ -58,10 +58,9 @@ public class NotificationItem {
         String[] metadata;
         metadata = type.split("_");
         return (metadata[0].equals("FAN")?"Your fan ":"Your light ")
-        + "at " + room_name + " "
         + "is " + (userID.equals("")?"automatically turned ":"turned ")
         + (metadata[1].equals("OFF")?"off":"on")
-        + (metadata[1].equals("ON")?"":" at mode " + metadata[1])
+        + (!metadata[1].equals("ON") && !metadata[1].equals("OFF")?" at mode " + metadata[1]:"")
         + (userID.equals("")?"!":" by mobile app!");
     }
 
@@ -72,16 +71,20 @@ public class NotificationItem {
                 "Sep", "Oct", "Nov", "Dec"};
         Calendar cal = Calendar.getInstance();
         cal.setTime(timestamp);
-        return cal.get(Calendar.HOUR_OF_DAY) + ":"
-                + cal.get(Calendar.MINUTE) + ", "
+        String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
+        String minute = String.valueOf(cal.get(Calendar.MINUTE));
+        hour = hour.length() == 1?'0'+ hour:hour;
+        minute = minute.length() == 1?'0' + minute:minute;
+        return hour + ":"
+                + minute + ", "
                 + months[cal.get(Calendar.MONTH)] + " "
                 + cal.get(Calendar.DAY_OF_MONTH) + ", "
                 + cal.get(Calendar.YEAR);
     }
 
-    public void setRoom_name(String room_name) {
-        this.room_name = room_name;
-    }
+//    public void setRoom_name(String room_name) {
+//        this.room_name = room_name;
+//    }
 
     public void setType(String type) {
         this.type = type;

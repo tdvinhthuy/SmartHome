@@ -21,8 +21,8 @@ public class MQTTService {
     public MQTTService(Context context) {
         // subscribed topics
         topics = new ArrayList<>();
-        topics.add(topicTempHumidSensor);
         topics.add(topicLightSensor);
+        topics.add(topicTempHumidSensor);
 
         // mqtt client
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientID);

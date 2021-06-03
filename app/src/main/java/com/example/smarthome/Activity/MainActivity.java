@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         Float data = Float.valueOf(jsonObject.getString("data"));
         if (jsonObject.get("name").equals("LIGHT")) { // light sensor
             // store to db
-            writeSensorData(jsonObject);
+            //writeSensorData(jsonObject);
             // check light intensity
             onLightDataArrived(data);
         }
@@ -344,12 +344,12 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
             String collection = sensor_name.equals("LIGHT")?"light_records":"temp_humid_records";
             Map<String, Object> record = new HashMap<>();
             if (sensor_name.equals("LIGHT")) {
-                record.put("data", data);
+                record.put("data", Integer.valueOf(data));
             }
             else {
                 String[] temp_humid = data.split("-");
-                record.put("temp_data", Float.valueOf(temp_humid[0]));
-                record.put("humid_data", Float.valueOf(temp_humid[1]));
+                record.put("temp_data", Integer.valueOf(temp_humid[0]));
+                record.put("humid_data", Integer.valueOf(temp_humid[1]));
             }
             record.put("timestamp", FieldValue.serverTimestamp());
             db.collection(collection)

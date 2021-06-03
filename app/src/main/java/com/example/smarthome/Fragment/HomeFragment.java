@@ -161,7 +161,19 @@ public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelect
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
                         if (querySnapshot == null || querySnapshot.isEmpty()) return;
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-                        tvLightIntensityRoom.setText(String.format("%s lux", document.getString("data")));
+                        tvLightIntensityRoom.setText(String.format("%d lux", document.get("data")));
+                    }
+                });
+        // Temp humid
+        db.collection("temp_humid_records")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        tvTemperatureRoom.setText(String.format("%d ˚C", document.getString("temp_data")));
+                        tvHumidityRoom.setText(String.format("%.2f %", Float.parseFloat(document.getString("humid_data"))/100));
                     }
                 });
     }

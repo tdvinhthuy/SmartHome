@@ -29,12 +29,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-enum DATE_ERRORS {
-    NO_ERROR,
-    INVALID,
-    EXCEEDCURRENTDAY
-}
 public class StatisticsFragment extends Fragment {
+    enum DATE_ERRORS {
+        NO_ERROR,
+        INVALID,
+        EXCEED_CURRENTDAY
+    }
+
     private View layoutStatisticGen, layoutStatisticSpec;
 
     private TextView btnToday, btnYesterday, btnThisWeek, btnThisMonth;
@@ -224,7 +225,7 @@ public class StatisticsFragment extends Fragment {
                 else if (checkDate() == DATE_ERRORS.INVALID) {
                     tvDateError.setText("To-Date must be after From-Date!");
                 }
-                else if (checkDate() == DATE_ERRORS.EXCEEDCURRENTDAY) {
+                else if (checkDate() == DATE_ERRORS.EXCEED_CURRENTDAY) {
                     tvDateError.setText("Date cannot exceed today!");
                 }
             }
@@ -257,27 +258,20 @@ public class StatisticsFragment extends Fragment {
         // Avg Light Intensity
         lightRecord.orderBy("timestamp", Query.Direction.ASCENDING)
                 .whereGreaterThan("timestamp", new Date(fromDateInMillis))
-                .whereLessThan("timestamp", new Date(toDateInMillis)).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .whereLessThan("timestamp", new Date(toDateInMillis))
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            int totalLightIntense = 0;
-                            int count = 0;
-                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-//                                Log.d("INFORMATION", document.getId() + " => " + document.getData().get("data"));
-                                totalLightIntense = totalLightIntense + Integer.parseInt(Objects.requireNonNull(document.getData().get("data")).toString());
-                                count = count + 1;
-                            }
-                            double avgLightIntensity = Math.ceil((double) totalLightIntense / (double) count);
-                            tv_AvgLightIntenseVal.setText(String.format("%s lux", String.format("%.0f", avgLightIntensity)));
-                        } else {
-                            Log.d("ERROR", "Error getting documents: ", task.getException());
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        int totalLightIntense = 0;
+                        int count = querySnapshot.size();
+                        for (DocumentSnapshot document : querySnapshot) {
+                            totalLightIntense = totalLightIntense + Integer.parseInt(document.get("data").toString());
                         }
+                        double avgLightIntensity = Math.ceil((double) totalLightIntense / (double) count);
+                        tv_AvgLightIntenseVal.setText(String.format("%.2f lux", avgLightIntensity));
                     }
                 });
-
-
     }
 
 
@@ -299,9 +293,9 @@ public class StatisticsFragment extends Fragment {
 
 //        if (fromYear > year || fromMonth > month + 1 || fromDay > day) return "exceedCurrentDay";
 
-        if (fromYear > year || toYear > year) return DATE_ERRORS.EXCEEDCURRENTDAY;
-        if ((fromYear == year && fromMonth > month) || (toYear == year && toMonth > month)) return DATE_ERRORS.EXCEEDCURRENTDAY;
-        if ((fromYear == year && fromMonth == month && fromDay > day) || (toYear == year && toMonth == month && toDay > day)) return DATE_ERRORS.EXCEEDCURRENTDAY;
+        if (fromYear > year || toYear > year) return DATE_ERRORS.EXCEED_CURRENTDAY;
+        if ((fromYear == year && fromMonth > month) || (toYear == year && toMonth > month)) return DATE_ERRORS.EXCEED_CURRENTDAY;
+        if ((fromYear == year && fromMonth == month && fromDay > day) || (toYear == year && toMonth == month && toDay > day)) return DATE_ERRORS.EXCEED_CURRENTDAY;
 
         if (fromYear > toYear) return DATE_ERRORS.INVALID;
         if (fromYear == toYear && fromMonth > toMonth) return DATE_ERRORS.INVALID;

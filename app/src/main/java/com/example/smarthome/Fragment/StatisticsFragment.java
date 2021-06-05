@@ -164,7 +164,7 @@ public class StatisticsFragment extends Fragment {
                 loadStatisticSpecLayout();
                 tv_statisticOption.setText("Today");
                 String todayDate = String.format("%s/%s/%s", day, month+1, year);
-                Log.d("TODAY", todayDate);
+//                Log.d("TODAY", todayDate);
                 loadReport(todayDate, todayDate);
             }
         });
@@ -266,7 +266,10 @@ public class StatisticsFragment extends Fragment {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            tv_AvgLightIntenseVal.setText("No Value");
+                            return;
+                        }
                         int totalLightIntense = 0;
                         int count = querySnapshot.size();
                         for (DocumentSnapshot document : querySnapshot) {
@@ -284,7 +287,10 @@ public class StatisticsFragment extends Fragment {
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            tv_AvgFanOpTimeVal.setText("No Value");
+                            return;
+                        };
                         long totalFanOpTime = 0;
                         int numberOfState = querySnapshot.size();
                         int nthState = 1;
@@ -332,20 +338,22 @@ public class StatisticsFragment extends Fragment {
                         if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
                         if (numberOfMin > 0) output = output + numberOfMin + "mins(s) ";
                         if (numberOfSec > 0) output = output + numberOfSec + "sec(s)";
-                        if (numberOfState == 0) output = "0";
+//                        Log.d("NUMBER OF FAN STATE", String.valueOf(numberOfState));
                         tv_AvgFanOpTimeVal.setText(output);
                     }
                 });
 
-        // Average Lighting Time
-        // Avg Fan Operating Time
+        // Average Light Operating Time
         lightState.orderBy("timestamp", Query.Direction.ASCENDING)
                 .whereGreaterThan("timestamp", new Date(fromDateInMillis))
                 .whereLessThan("timestamp", new Date(toDateInMillis))
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            tv_AvgLightOpTimeVal.setText("No Value");
+                            return;
+                        }
                         long totalLightOpTime = 0;
                         int numberOfState = querySnapshot.size();
                         int nthState = 1;
@@ -393,7 +401,6 @@ public class StatisticsFragment extends Fragment {
                         if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
                         if (numberOfMin > 0) output = output + numberOfMin + "mins(s) ";
                         if (numberOfSec > 0) output = output + numberOfSec + "sec(s)";
-                        if (numberOfState == 0) output = "0";
                         tv_AvgLightOpTimeVal.setText(output);
                     }
                 });

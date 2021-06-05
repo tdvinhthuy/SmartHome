@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 //import android.content.Context;
 //import android.graphics.Color;
 //import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.DatePicker;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import com.example.smarthome.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
 
@@ -54,7 +56,7 @@ public class StatisticsFragment extends Fragment {
     // Firebase
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private CollectionReference lightRecord;
+    private CollectionReference lightRecord, fanState, lightState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +64,8 @@ public class StatisticsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         lightRecord = db.collection("light_records");
+        fanState = db.collection("fan_states");
+        lightState = db.collection("light_states");
     }
 
     @Override
@@ -270,6 +274,127 @@ public class StatisticsFragment extends Fragment {
                         }
                         double avgLightIntensity = Math.ceil((double) totalLightIntense / (double) count);
                         tv_AvgLightIntenseVal.setText(String.format("%.2f lux", avgLightIntensity));
+                    }
+                });
+
+        // Avg Fan Operating Time
+        fanState.orderBy("timestamp", Query.Direction.ASCENDING)
+                .whereGreaterThan("timestamp", new Date(fromDateInMillis))
+                .whereLessThan("timestamp", new Date(toDateInMillis))
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        long totalFanOpTime = 0;
+                        int numberOfState = querySnapshot.size();
+                        int nthState = 1;
+                        int timesOfFanInOp = 0;
+                        boolean lastState = false; // Fasle for OFF, True for ON (LOW | MEDIUM | HIGH)
+                        for (DocumentSnapshot document : querySnapshot) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                String state = document.get("state").toString();
+                                Timestamp timestamp = (Timestamp) document.get("timestamp");
+                                long timestampInMillis = timestamp.toDate().getTime();
+                                if (nthState == 1) {
+                                    if (Objects.equals(state, "OFF")) totalFanOpTime = totalFanOpTime - fromDateInMillis;
+                                }
+                                if (nthState == numberOfState) {
+                                    if (Objects.equals(state, "ON")) {
+                                        totalFanOpTime = totalFanOpTime + toDateInMillis;
+                                        timesOfFanInOp = timesOfFanInOp + 1;
+                                    }
+                                }
+
+                                if (Objects.equals(state, "OFF")) {
+                                    if (lastState == true) {
+                                        lastState = false;
+                                        totalFanOpTime = totalFanOpTime + timestampInMillis;
+                                        timesOfFanInOp = timesOfFanInOp + 1;
+                                    }
+                                }
+                                else {
+                                    if (lastState == false) {
+                                        totalFanOpTime = totalFanOpTime - timestampInMillis;
+                                        lastState = true;
+                                    }
+                                }
+                            }
+                            nthState++;
+                        }
+                        // Convert total time to second
+                        totalFanOpTime /= 1000;
+                        long avgLightOpTime = totalFanOpTime/timesOfFanInOp;
+                        // Calculate hours, mins and secs
+                        long numberOfHour = avgLightOpTime/3600L;
+                        long numberOfMin = (avgLightOpTime - numberOfHour*3600L)/60L;
+                        long numberOfSec = avgLightOpTime - numberOfHour*3600L - numberOfMin*60L;
+                        String output = "";
+                        if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
+                        if (numberOfMin > 0) output = output + numberOfMin + "mins(s) ";
+                        if (numberOfSec > 0) output = output + numberOfSec + "sec(s)";
+                        if (numberOfState == 0) output = "0";
+                        tv_AvgFanOpTimeVal.setText(output);
+                    }
+                });
+
+        // Average Lighting Time
+        // Avg Fan Operating Time
+        lightState.orderBy("timestamp", Query.Direction.ASCENDING)
+                .whereGreaterThan("timestamp", new Date(fromDateInMillis))
+                .whereLessThan("timestamp", new Date(toDateInMillis))
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        long totalLightOpTime = 0;
+                        int numberOfState = querySnapshot.size();
+                        int nthState = 1;
+                        int timesOfLightInOp = 0;
+                        boolean lastState = false; // Fasle for OFF, True for ON
+                        for (DocumentSnapshot document : querySnapshot) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                String state = document.get("state").toString();
+                                Timestamp timestamp = (Timestamp) document.get("timestamp");
+                                long timestampInMillis = timestamp.toDate().getTime();
+                                if (nthState == 1) {
+                                    if (Objects.equals(state, "OFF")) totalLightOpTime = totalLightOpTime - fromDateInMillis;
+                                }
+                                if (nthState == numberOfState) {
+                                    if (Objects.equals(state, "ON")) {
+                                        totalLightOpTime = totalLightOpTime + toDateInMillis;
+                                        timesOfLightInOp = timesOfLightInOp + 1;
+                                    }
+                                }
+
+                                if (Objects.equals(state, "OFF")) {
+                                    if (lastState == true) {
+                                        totalLightOpTime = totalLightOpTime + timestampInMillis;
+                                        timesOfLightInOp = timesOfLightInOp + 1;
+                                        lastState = false;
+                                    }
+                                }
+                                else {
+                                    if (lastState == false) {
+                                        totalLightOpTime = totalLightOpTime - timestampInMillis;
+                                        lastState = true;
+                                    }
+                                }
+                            }
+                            nthState++;
+                        }
+                        // Convert total time to second
+                        totalLightOpTime /= 1000;
+                        long avgLightOpTime = totalLightOpTime/timesOfLightInOp;
+                        // Calculate hours, mins and secs
+                        long numberOfHour = avgLightOpTime/3600L;
+                        long numberOfMin = (avgLightOpTime - numberOfHour*3600L)/60L;
+                        long numberOfSec = avgLightOpTime - numberOfHour*3600L - numberOfMin*60L;
+                        String output = "";
+                        if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
+                        if (numberOfMin > 0) output = output + numberOfMin + "mins(s) ";
+                        if (numberOfSec > 0) output = output + numberOfSec + "sec(s)";
+                        if (numberOfState == 0) output = "0";
+                        tv_AvgLightOpTimeVal.setText(output);
                     }
                 });
     }

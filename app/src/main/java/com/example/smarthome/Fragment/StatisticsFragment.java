@@ -258,7 +258,10 @@ public class StatisticsFragment extends Fragment {
     private void loadReport(String fromDate, String toDate) {
         long fromDateInMillis = convertDateStringToMils(fromDate);
         long toDateInMillis = convertDateStringToMils(toDate) + 86400000L;
-
+        Date toDayDate = new Date();
+        long currentTimeInMillis = toDayDate.getTime();
+//        Log.d("TO_DAY_DATE", "Current date using Date = "+toDayDate.toString());
+//        Log.d("TO_DAY_IN_MILLIS", "Current time in milliseconds using Date = "+toDayInMillis);
         // Avg Light Intensity
         lightRecord.orderBy("timestamp", Query.Direction.ASCENDING)
                 .whereGreaterThan("timestamp", new Date(fromDateInMillis))
@@ -306,7 +309,8 @@ public class StatisticsFragment extends Fragment {
                                 }
                                 if (nthState == numberOfState) {
                                     if (Objects.equals(state, "ON")) {
-                                        totalFanOpTime = totalFanOpTime + toDateInMillis;
+                                        if (toDateInMillis <= currentTimeInMillis) totalFanOpTime = totalFanOpTime + toDateInMillis;
+                                        else totalFanOpTime = totalFanOpTime + currentTimeInMillis;
                                         timesOfFanInOp = timesOfFanInOp + 1;
                                     }
                                 }
@@ -336,7 +340,7 @@ public class StatisticsFragment extends Fragment {
                         long numberOfSec = avgLightOpTime - numberOfHour*3600L - numberOfMin*60L;
                         String output = "";
                         if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
-                        if (numberOfMin > 0) output = output + numberOfMin + "mins(s) ";
+                        if (numberOfMin > 0) output = output + numberOfMin + "min(s) ";
                         if (numberOfSec > 0) output = output + numberOfSec + "sec(s)";
 //                        Log.d("NUMBER OF FAN STATE", String.valueOf(numberOfState));
                         tv_AvgFanOpTimeVal.setText(output);
@@ -369,7 +373,8 @@ public class StatisticsFragment extends Fragment {
                                 }
                                 if (nthState == numberOfState) {
                                     if (Objects.equals(state, "ON")) {
-                                        totalLightOpTime = totalLightOpTime + toDateInMillis;
+                                        if (toDateInMillis <= currentTimeInMillis) totalLightOpTime = totalLightOpTime + toDateInMillis;
+                                        else totalLightOpTime = totalLightOpTime + currentTimeInMillis;
                                         timesOfLightInOp = timesOfLightInOp + 1;
                                     }
                                 }
@@ -399,7 +404,7 @@ public class StatisticsFragment extends Fragment {
                         long numberOfSec = avgLightOpTime - numberOfHour*3600L - numberOfMin*60L;
                         String output = "";
                         if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
-                        if (numberOfMin > 0) output = output + numberOfMin + "mins(s) ";
+                        if (numberOfMin > 0) output = output + numberOfMin + "min(s) ";
                         if (numberOfSec > 0) output = output + numberOfSec + "sec(s)";
                         tv_AvgLightOpTimeVal.setText(output);
                     }

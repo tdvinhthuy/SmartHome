@@ -184,12 +184,12 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                             //if (document.getString("room_name").equals(room.getName())) {
                                 // get state
                                 String state = document.getString("state");
-                                if (state.equals("OFF") && data < 100) {
+                                if (state.equals("OFF") && data < 700) {
                                     // turn light ON
                                     onLightChange(2, true);
                                     Log.d("LIGHT_STATE", "Automatically turned ON!");
                                 }
-                                else if (state.equals("ON") && data >= 100) {
+                                else if (state.equals("ON") && data >= 700) {
                                     // turn light OFF
                                     onLightChange(0, true);
                                     Log.d("LIGHT_STATE", "Automatically turned OFF!");

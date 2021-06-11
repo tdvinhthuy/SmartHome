@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     //private Room room;
     private MQTTService mqttService;
     // topic
-    final String topicLight = "smarthomehcmut/feeds/bk-iot-led";
-    final String topicFan = "smarthomehcmut/feeds/bk-iot-traffic";
+    final String topicLight = "CSE_BBC/feeds/bkiot-led";
+    final String topicFan = "CSE_BBC/feeds/bkiot-drv";
     // db
     final FirebaseFirestore db = FirebaseFirestore.getInstance();
     final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -149,6 +149,15 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         writeDeviceState(lightState, false, bAuto);
     }
 
+
+    /* This is enum for LEVEL OF FAN */
+    int OFF_LV = 0;
+    int LOW_LV = 85;
+    int MEDIUM_LV = 170;
+    int HIGH_LV = 255;
+    /* This is enum for LEVEL OF FAN */
+
+
     @Override
     public void onFanChange(int state, boolean bAuto) {
         // send MQTT
@@ -156,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         String topic = topicFan;
         sendDataMQTT(data.toString(), topic);
         // store to database
-        String fanState = state==0?"OFF":(state==1?"LOW":(state==2?"MEDIUM":"HIGH"));
+        String fanState = state==OFF_LV?"OFF":(state==LOW_LV?"LOW":(state==MEDIUM_LV?"MEDIUM":"HIGH"));
         writeDeviceState(fanState, true, bAuto);
     }
 
@@ -177,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                                 String state = document.getString("state");
                                 if (state.equals("OFF") && data < 100) {
                                     // turn light ON
-                                    onLightChange(1, true);
+                                    onLightChange(2, true);
                                     Log.d("LIGHT_STATE", "Automatically turned ON!");
                                 }
                                 else if (state.equals("ON") && data >= 100) {
@@ -208,16 +217,16 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                                     String state = document.getString("state");
                                     if (state == null) return;
                                     if (!state.equals("OFF") && data <= 30) { // turn the Fan OFF
-                                        onFanChange(0, true);
+                                        onFanChange(OFF_LV, true);
                                     }
                                     if (!state.equals("HIGH") && data > 34) { // change Fan to HIGH
-                                        onFanChange(3, true);
+                                        onFanChange(HIGH_LV, true);
                                     }
                                     else if (!state.equals("MEDIUM") && data > 32) { // change Fan to MEDIUM
-                                        onFanChange(2, true);
+                                        onFanChange(MEDIUM_LV, true);
                                     }
                                     else if (!state.equals("LOW") && data > 30) { // change Fan to LOW
-                                        onFanChange(1, true);
+                                        onFanChange(LOW_LV, true);
                                     }
                                     return;
                                 //}
@@ -325,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         Float data = Float.valueOf(jsonObject.getString("data"));
         if (jsonObject.get("name").equals("LIGHT")) { // light sensor
             // store to db
-            //writeSensorData(jsonObject);
+            writeSensorData(jsonObject);
             // check light intensity
             onLightDataArrived(data);
         }

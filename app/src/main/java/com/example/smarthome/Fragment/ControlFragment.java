@@ -3,6 +3,7 @@ package com.example.smarthome.Fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
     private RoomListener roomListener;
     private CompoundButton.OnCheckedChangeListener lightListener;
     private CompoundButton.OnCheckedChangeListener fanListener;
+    private TextView tvTempVal, tvLightIntVal;
     private ArrayAdapter<String> adapter;
 //    public ControlFragment() {
 //        room = null;
@@ -44,6 +46,14 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
 //    public ControlFragment(Room room) {
 //        this.room = room;
 //    }
+
+
+    /* This is enum for LEVEL OF FAN */
+    int OFF_LV = 0;
+    int LOW_LV = 85;
+    int MEDIUM_LV = 170;
+    int HIGH_LV = 255;
+    /* This is enum for LEVEL OF FAN */
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,7 +73,7 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
                 }
                 if (isChecked) {
                     rbLow.setChecked(true);
-                    roomListener.onFanChange(1, false);
+                    roomListener.onFanChange(LOW_LV, false);
                 }
                 if (!isChecked) {
                     rgFan.clearCheck();
@@ -112,22 +122,27 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
         rbLow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(85, false);
+                roomListener.onFanChange(LOW_LV, false);
             }
         });
         rbMedium.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(170, false);
+                roomListener.onFanChange(MEDIUM_LV, false);
             }
         });
         rbHigh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(255, false);
+                roomListener.onFanChange(HIGH_LV, false);
             }
         });
 
+
+        // get text view of temperature value and light intensity value
+        tvTempVal = view.findViewById(R.id.tvTemperature);
+        tvLightIntVal = view.findViewById(R.id.tvLightIntVal);
+        loadData();
         return view;
     }
 
@@ -208,6 +223,37 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
         });
     }
 
+
+    private void loadData() {
+        // Light intensity
+        db.collection("light_records")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            tvLightIntVal.setText("No Data");
+                            return;
+                        }
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        tvLightIntVal.setText(String.format("%d lux", document.get("data")));
+                    }
+                });
+        // Temp humid
+        db.collection("temp_humid_records")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            tvTempVal.setText("No Data");
+                            return;
+                        }
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        tvTempVal.setText(String.format("%d ˚C", document.getString("temp_data")));
+                    }
+                });
+    }
     /*
     private void loadRoom() {
         db.collection("rooms").whereEqualTo("type", room.getStringType())

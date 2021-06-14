@@ -56,7 +56,7 @@ public class StatisticsFragment extends Fragment {
     // Firebase
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private CollectionReference lightRecord, fanState, lightState;
+    private CollectionReference lightRecord, tempRecord, fanState, lightState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +64,7 @@ public class StatisticsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         lightRecord = db.collection("light_records");
+        tempRecord = db.collection("temp_humid_records");
         fanState = db.collection("fan_states");
         lightState = db.collection("light_states");
     }
@@ -245,7 +246,6 @@ public class StatisticsFragment extends Fragment {
             }
         });
 
-
         return view;
     }
 
@@ -262,6 +262,7 @@ public class StatisticsFragment extends Fragment {
         long currentTimeInMillis = toDayDate.getTime();
 //        Log.d("TO_DAY_DATE", "Current date using Date = "+toDayDate.toString());
 //        Log.d("TO_DAY_IN_MILLIS", "Current time in milliseconds using Date = "+toDayInMillis);
+
         // Avg Light Intensity
         lightRecord.orderBy("timestamp", Query.Direction.ASCENDING)
                 .whereGreaterThan("timestamp", new Date(fromDateInMillis))
@@ -280,6 +281,27 @@ public class StatisticsFragment extends Fragment {
                         }
                         double avgLightIntensity = Math.ceil((double) totalLightIntense / (double) count);
                         tv_AvgLightIntenseVal.setText(String.format("%.2f lux", avgLightIntensity));
+                    }
+                });
+
+        // Avg Temperature Intensity
+        tempRecord.orderBy("timestamp", Query.Direction.ASCENDING)
+                .whereGreaterThan("timestamp", new Date(fromDateInMillis))
+                .whereLessThan("timestamp", new Date(toDateInMillis))
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            tv_AvgTempVal.setText("No Data");
+                            return;
+                        }
+                        int totalTemp = 0;
+                        int count = querySnapshot.size();
+                        for (DocumentSnapshot document : querySnapshot) {
+                            totalTemp = totalTemp + Integer.parseInt(document.get("temp_data").toString());
+                        }
+                        int avgLightIntensity = totalTemp / count;
+                        tv_AvgTempVal.setText(String.format("%d ˚C", avgLightIntensity));
                     }
                 });
 

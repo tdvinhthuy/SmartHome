@@ -59,7 +59,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="30 °C"
+                    android:text=""
                     android:textColor="@color/temperature"
                     android:textStyle="bold"
                     android:textSize="40sp"
@@ -160,14 +160,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="828 lux"
+                    android:text=""
                     android:textColor="@color/humidity"
                     android:textStyle="bold"
                     android:textSize="40sp"
                     android:layout_below="@id/imgWater"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
-                    android:id="@+id/tvHumidity"/>
+                    android:id="@+id/tvLightIntVal"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -176,7 +176,7 @@
                     android:text="LIGHT"
                     android:textSize="30sp"
                     android:textStyle="bold"
-                    android:layout_below="@id/tvHumidity"
+                    android:layout_below="@+id/tvLightIntVal"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="30dp"
                     android:id="@+id/tvLight"

@@ -59,7 +59,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="30"
+                    android:text="30 °C"
                     android:textColor="@color/temperature"
                     android:textStyle="bold"
                     android:textSize="40sp"
@@ -143,12 +143,12 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="5dp"
-                    android:src="@drawable/_19___humidity_512"
+                    android:src="@drawable/summer_vacation_sun_sunlight_summer_heat_hot_512"
                     android:id="@+id/imgWater"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Current Temperature"
+                    android:text="Current Light Intensity"
                     android:layout_toEndOf="@id/imgWater"
                     android:layout_toRightOf="@id/imgWater"
                     android:layout_marginTop="10dp"
@@ -160,7 +160,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5"
+                    android:text="828 lux"
                     android:textColor="@color/humidity"
                     android:textStyle="bold"
                     android:textSize="40sp"

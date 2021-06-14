@@ -112,19 +112,19 @@ public class ControlFragment extends Fragment /*implements AdapterView.OnItemSel
         rbLow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(1, false);
+                roomListener.onFanChange(85, false);
             }
         });
         rbMedium.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(2, false);
+                roomListener.onFanChange(170, false);
             }
         });
         rbHigh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                roomListener.onFanChange(3, false);
+                roomListener.onFanChange(255, false);
             }
         });
 

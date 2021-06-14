@@ -324,7 +324,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="25dp"
-                android:text="Fan’s average operating time"
+                android:text="Total fan’s operating time"
                 android:textSize="25sp"
                 android:paddingLeft="40dp"/>
             <ImageView
@@ -391,7 +391,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="25dp"
-                android:text="Light’s average operating time"
+                android:text="Total light’s operating time"
                 android:textSize="25sp"
                 android:paddingLeft="40dp"/>
             <ImageView

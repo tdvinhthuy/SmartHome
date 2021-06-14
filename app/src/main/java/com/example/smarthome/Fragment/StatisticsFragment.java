@@ -308,7 +308,7 @@ public class StatisticsFragment extends Fragment {
                                     if (Objects.equals(state, "OFF")) totalFanOpTime = totalFanOpTime - fromDateInMillis;
                                 }
                                 if (nthState == numberOfState) {
-                                    if (Objects.equals(state, "ON")) {
+                                    if (!Objects.equals(state, "OFF")) {
                                         if (toDateInMillis <= currentTimeInMillis) totalFanOpTime = totalFanOpTime + toDateInMillis;
                                         else totalFanOpTime = totalFanOpTime + currentTimeInMillis;
                                         timesOfFanInOp = timesOfFanInOp + 1;
@@ -333,11 +333,11 @@ public class StatisticsFragment extends Fragment {
                         }
                         // Convert total time to second
                         totalFanOpTime /= 1000;
-                        long avgLightOpTime = totalFanOpTime/timesOfFanInOp;
+//                        long avgLightOpTime = totalFanOpTime/timesOfFanInOp;
                         // Calculate hours, mins and secs
-                        long numberOfHour = avgLightOpTime/3600L;
-                        long numberOfMin = (avgLightOpTime - numberOfHour*3600L)/60L;
-                        long numberOfSec = avgLightOpTime - numberOfHour*3600L - numberOfMin*60L;
+                        long numberOfHour = totalFanOpTime/3600L;
+                        long numberOfMin = (totalFanOpTime - numberOfHour*3600L)/60L;
+                        long numberOfSec = totalFanOpTime - numberOfHour*3600L - numberOfMin*60L;
                         String output = "";
                         if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
                         if (numberOfMin > 0) output = output + numberOfMin + "min(s) ";
@@ -399,9 +399,9 @@ public class StatisticsFragment extends Fragment {
                         totalLightOpTime /= 1000;
                         long avgLightOpTime = totalLightOpTime/timesOfLightInOp;
                         // Calculate hours, mins and secs
-                        long numberOfHour = avgLightOpTime/3600L;
-                        long numberOfMin = (avgLightOpTime - numberOfHour*3600L)/60L;
-                        long numberOfSec = avgLightOpTime - numberOfHour*3600L - numberOfMin*60L;
+                        long numberOfHour = totalLightOpTime/3600L;
+                        long numberOfMin = (totalLightOpTime - numberOfHour*3600L)/60L;
+                        long numberOfSec = totalLightOpTime - numberOfHour*3600L - numberOfMin*60L;
                         String output = "";
                         if (numberOfHour > 0) output = output + numberOfHour + "hr(s) ";
                         if (numberOfMin > 0) output = output + numberOfMin + "min(s) ";

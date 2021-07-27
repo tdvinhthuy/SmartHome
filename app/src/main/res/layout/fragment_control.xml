@@ -59,7 +59,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="No Data"
                     android:textColor="@color/temperature"
                     android:textStyle="bold"
                     android:textSize="40sp"
@@ -137,7 +137,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/rlLightControl">
+                android:id="@+id/rlLedControl">
 
                 <ImageView
                     android:layout_width="40dp"
@@ -160,7 +160,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="No Data"
                     android:textColor="@color/humidity"
                     android:textStyle="bold"
                     android:textSize="40sp"
@@ -173,13 +173,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:text="LIGHT"
+                    android:text="LED"
                     android:textSize="30sp"
                     android:textStyle="bold"
                     android:layout_below="@+id/tvLightIntVal"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="30dp"
-                    android:id="@+id/tvLight"
+                    android:id="@+id/tvLed"
                     android:layout_marginStart="30dp" />
 
                 <ImageView
@@ -187,20 +187,20 @@
                     android:layout_height="50dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginLeft="10dp"
-                    android:layout_toEndOf="@id/tvLight"
-                    android:layout_toRightOf="@id/tvLight"
-                    android:layout_alignBottom="@id/tvLight"
+                    android:layout_toEndOf="@id/tvLed"
+                    android:layout_toRightOf="@id/tvLed"
+                    android:layout_alignBottom="@id/tvLed"
                     android:src="@drawable/__light_bulb_idea_creative_512" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@id/tvLight"
-                    android:layout_toRightOf="@id/tvLight"
+                    android:layout_alignBaseline="@id/tvLed"
+                    android:layout_toRightOf="@id/tvLed"
                     android:layout_marginLeft="140dp"
                     android:layout_marginStart="140dp"
-                    android:layout_toEndOf="@id/tvLight"
-                    android:id="@+id/switchLight"/>
+                    android:layout_toEndOf="@id/tvLed"
+                    android:id="@+id/switchLed"/>
             </RelativeLayout>
 
         </LinearLayout>

@@ -7,25 +7,28 @@ import org.eclipse.paho.client.mqttv3.*;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MQTTService {
-    private String serverUri = "tcp://io.adafruit.com:1883";
-    private String clientID = "";
-    private String username = "smarthomehcmut";
-    private String password = "aio_yPRQ24NT0LXN6itBeH9yBa00MhVz";
-    private final String topicLightSensor = "CSE_BBC1/feeds/bk-iot-light";
-    private final String topicTempHumidSensor = "CSE_BBC/feeds/bk-iot-temp-humid";
-    private ArrayList<String> topics;
+    private final String serverUri = "tcp://io.adafruit.com:1883";
+//    private String serverUri = "https://io.adafruit.com/";
+    private final String clientID = "";
+    private final String username = "CSE_BBC";
+    private final String key = "";
+    private final String LED_FEED = "CSE_BBC/feeds/bk-iot-led";
+    private final String FAN_FEED = "CSE_BBC/feeds/bk-iot-drv";
+    private List<String> FEEDS;
     public MqttAndroidClient mqttAndroidClient;
 
     public MQTTService(Context context) {
-        // subscribed topics
-        topics = new ArrayList<>();
-        topics.add(topicLightSensor);
-        topics.add(topicTempHumidSensor);
-
         // mqtt client
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientID);
+
+        // feeds
+        FEEDS = new ArrayList<>();
+        FEEDS.add(LED_FEED);
+        FEEDS.add(FAN_FEED);
+
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -55,7 +58,7 @@ public class MQTTService {
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setCleanSession(false);
         mqttConnectOptions.setUserName(username);
-        mqttConnectOptions.setPassword(password.toCharArray());
+        mqttConnectOptions.setPassword(key.toCharArray());
 
         try {
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
@@ -71,7 +74,7 @@ public class MQTTService {
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
 
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    subscribeToTopic();
+                    subscribeToFeed(FEEDS);
                 }
 
                 @Override
@@ -84,13 +87,13 @@ public class MQTTService {
         }
     }
 
-    public void subscribeToTopic() {
-        for (String topic: topics) {
+    public void subscribeToFeed(List<String> feeds) {
+        for (String feed : feeds) {
             try {
-                mqttAndroidClient.subscribe(topic, 0, null, new IMqttActionListener() {
+                mqttAndroidClient.subscribe(feed, 0, null, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
-                        Log.w("Mqtt", "Subscribed to " + topic + "!");
+                        Log.w("Mqtt", "Subscribed to " + feed + "!");
                     }
 
                     @Override

@@ -1,96 +1,93 @@
 package com.example.smarthome.Utils;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class NotificationItem {
-    public enum NotificationType {
-        LIGHT_ON,
-        LIGHT_OFF,
-        FAN_OFF,
-        FAN_LOW,
-        FAN_MEDIUM,
-        FAN_HIGH
-    }
-//    private String room_name;
-    private String type;
-    private Date timestamp;
-    private String userID;
+    final String LIGHT = "13";
+    final String TEMP_HUMID = "7";
+    final String LED = "1";
+    final String FAN = "10";
+    final int LIGHT_HIGH = 0;
+    final int LIGHT_LOW = 1;
+    final int TEMP_XLOW = 2;
+    final int TEMP_LOW = 3;
+    final int TEMP_MEDIUM = 4;
+    final int TEMP_HIGH = 5;
+
+    private String device;
+    private int state;
+    private Date time;
 
     public NotificationItem() {
-//        this.room_name = "";
-        this.type = "";
-        this.timestamp = null;
-        this.userID = "";
-    }
-    public NotificationItem(/*String room_name,*/ String type, Date timestamp, String userID) {
-        this.type = type;
-//        this.room_name = room_name;
-        this.timestamp = timestamp;
-        this.userID = userID;
+        this.device = "";
+        this.state = -1;
+        this.time = null;
     }
 
-//    public String getRoom_name() {
-//        return room_name;
-//    }
-
-    public String getType() {
-        return type;
+    public NotificationItem(String device, int state, Date time) {
+        this.device = device;
+        this.state = state;
+        this.time = time;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public void setDevice(String device) {
+        this.device = device;
     }
 
-    public String getUserID() {
-        return userID;
+    public void setState(int state) {
+        this.state = state;
     }
 
-    public NotificationType getNotificationType() {
-        return NotificationType.valueOf(type);
+    public String getDevice() {
+        return device;
     }
 
-    public String getContent() {
-        String[] metadata;
-        metadata = type.split("_");
-        return (metadata[0].equals("FAN")?"Your fan ":"Your light ")
-        + "is " + (userID.equals("")?"automatically turned ":"turned ")
-        + (metadata[1].equals("OFF")?"off":"on")
-        + (!metadata[1].equals("ON") && !metadata[1].equals("OFF")?" at mode " + metadata[1]:"")
-        + (userID.equals("")?"!":" by mobile app!");
+    public int getState() {
+        return state;
     }
 
-    public String getStringTime() {
-        String[] months = {
-                "Jan", "Feb", "Mar", "Apr",
-                "May", "Jun", "Jul", "Aug",
-                "Sep", "Oct", "Nov", "Dec"};
-        Calendar cal = Calendar.getInstance();
-        if (timestamp != null) cal.setTime(timestamp);
-        String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
-        String minute = String.valueOf(cal.get(Calendar.MINUTE));
-        hour = hour.length() == 1?'0'+ hour:hour;
-        minute = minute.length() == 1?'0' + minute:minute;
-        return hour + ":"
-                + minute + ", "
-                + months[cal.get(Calendar.MONTH)] + " "
-                + cal.get(Calendar.DAY_OF_MONTH) + ", "
-                + cal.get(Calendar.YEAR);
+    public String getTitle() {
+        if (device.equals(LIGHT) || device.equals(TEMP_HUMID)) {
+            return "DATA EXCEEDS THRESHOLD";
+        }
+        return "DEVICE STATE CHANGES";
     }
 
-//    public void setRoom_name(String room_name) {
-//        this.room_name = room_name;
-//    }
-
-    public void setType(String type) {
-        this.type = type;
+    public Date getTime() {
+        return time;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(Date time) {
+        this.time = time;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public String getNotification() {
+        switch (state) {
+            case LIGHT_HIGH: switch (device) {
+                case LIGHT: return "It is bright";
+                case LED: return "Led is turned OFF";
+            }
+            case LIGHT_LOW: switch (device) {
+                case LIGHT: return "It is dark";
+                case LED: return "Led is turned ON";
+            }
+            case TEMP_XLOW: switch (device) {
+                case TEMP_HUMID: return "It is cold";
+                case FAN: return "Fan is turned OFF";
+            }
+            case TEMP_LOW: switch (device) {
+                case TEMP_HUMID: return "It is cool";
+                case FAN: return "Fan is changed to LOW";
+            }
+            case TEMP_MEDIUM: switch (device) {
+                case TEMP_HUMID: return "It is warm";
+                case FAN: return "Fan is changed to MEDIUM";
+            }
+            case TEMP_HIGH: switch (device) {
+                case TEMP_HUMID: return "It is hot";
+                case FAN: return "Fan is changed to HIGH";
+            }
+            default: return "";
+        }
     }
 }

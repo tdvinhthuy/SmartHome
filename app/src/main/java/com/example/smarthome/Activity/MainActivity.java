@@ -24,7 +24,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.*;
 import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.Query;
 import com.google.type.Date;
 import org.eclipse.paho.client.mqttv3.*;
 import org.json.JSONException;
@@ -32,23 +34,33 @@ import org.json.JSONObject;
 import org.json.JSONStringer;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements RoomListener {
+    final String LIGHT = "13";
+    final String TEMP_HUMID = "7";
+    final String LED = "1";
+    final String FAN = "10";
+    final int LIGHT_HIGH = 0;
+    final int LIGHT_LOW = 1;
+    final int TEMP_XLOW = 2;
+    final int TEMP_LOW = 3;
+    final int TEMP_MEDIUM = 4;
+    final int TEMP_HIGH = 5;
+
+
+    final String LED_FEED = "CSE_BBC/feeds/bk-iot-led";
+    final String FAN_FEED = "CSE_BBC/feeds/bk-iot-drv";
     private TextView tvDate;
-    //private Room room;
     private MQTTService mqttService;
-    // topic
-    final String topicLight = "CSE_BBC/feeds/bkiot-led";
-    final String topicFan = "CSE_BBC/feeds/bkiot-drv";
-    // db
-    final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    final DatabaseReference db = FirebaseDatabase.getInstance().getReference();
     final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    // notification
     final String CHANNEL_ID = "NOTIFICATION";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,189 +131,6 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
                 cal.get(Calendar.YEAR)));
     }
 
-    /*
-    @Override
-    public void onRoomChange(Room room, boolean control) {
-        //this.room = room;
-        Fragment fragment;
-        if (control) {
-            fragment = new ControlFragment(room);
-        }
-        else {
-            fragment = new HomeFragment(room);
-        }
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setReorderingAllowed(true)
-                .replace(R.id.fragmentContainer, fragment)
-                .commitNow();
-    }
-     */
-
-    @Override
-    public void onLightChange(int state, boolean bAuto) {
-        // MQTT send
-        JSONObject data = getJSONData(state ,false);
-        String topic = topicLight;
-        sendDataMQTT(data.toString(), topic);
-        // store to database
-        String lightState = state==0?"OFF":"ON";
-        writeDeviceState(lightState, false, bAuto);
-    }
-
-
-    /* This is enum for LEVEL OF FAN */
-    int OFF_LV = 0;
-    int LOW_LV = 85;
-    int MEDIUM_LV = 170;
-    int HIGH_LV = 255;
-    /* This is enum for LEVEL OF FAN */
-
-
-    @Override
-    public void onFanChange(int state, boolean bAuto) {
-        // send MQTT
-        JSONObject data = getJSONData(state ,true);
-        String topic = topicFan;
-        sendDataMQTT(data.toString(), topic);
-        // store to database
-        String fanState = state==OFF_LV?"OFF":(state==LOW_LV?"LOW":(state==MEDIUM_LV?"MEDIUM":"HIGH"));
-        writeDeviceState(fanState, true, bAuto);
-    }
-
-    @Override
-    public void onLightDataArrived(float data) {
-        db.collection("light_states")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                            DocumentSnapshot document =  querySnapshot.getDocuments().get(0);
-                            //if (document.getString("room_name").equals(room.getName())) {
-                                // get state
-                                String state = document.getString("state");
-                                if (state.equals("OFF") && data < 700) {
-                                    // turn light ON
-                                    onLightChange(2, true);
-                                    Log.d("LIGHT_STATE", "Automatically turned ON!");
-                                }
-                                else if (state.equals("ON") && data >= 700) {
-                                    // turn light OFF
-                                    onLightChange(0, true);
-                                    Log.d("LIGHT_STATE", "Automatically turned OFF!");
-                                }
-                            //}
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public void onTemperatureDataArrived(float data) {
-        db.collection("fan_states")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                            for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                                //if (document.getString("room_name").equals(room.getName())) {
-                                    // get state
-                                    String state = document.getString("state");
-                                    if (state == null) return;
-                                    if (!state.equals("OFF") && data <= 30) { // turn the Fan OFF
-                                        onFanChange(OFF_LV, true);
-                                    }
-                                    if (!state.equals("HIGH") && data > 34) { // change Fan to HIGH
-                                        onFanChange(HIGH_LV, true);
-                                    }
-                                    else if (!state.equals("MEDIUM") && data > 32) { // change Fan to MEDIUM
-                                        onFanChange(MEDIUM_LV, true);
-                                    }
-                                    else if (!state.equals("LOW") && data > 30) { // change Fan to LOW
-                                        onFanChange(LOW_LV, true);
-                                    }
-                                    return;
-                                //}
-                            }
-                        }
-                    }
-                });
-    }
-
-    private void writeDeviceState(String value, boolean isFan, boolean bAuto) {
-        String userID = bAuto?"":mAuth.getUid();
-        FieldValue timestamp = FieldValue.serverTimestamp();
-        // store to device collection
-        Map<String, Object> history = new HashMap<>();
-        //history.put("room_name", room.getName());
-        history.put("state", value);
-        history.put("timestamp", timestamp);
-        history.put("userID", userID);
-        String cDevice = isFan?"fan_states":"light_states";
-        db.collection(cDevice)
-                .add(history)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("DEVICE_STATE_WRITE", "Write success: " + history);
-                        }
-                        else {
-                            Log.d("DEVICE_STATE_WRITE", "Write fail");
-                        }
-                    }
-                });
-        // store to notification collection
-        String notificationType = "";
-        notificationType = notificationType + (isFan ? "FAN_" : "LIGHT_");
-        notificationType = notificationType + value;
-        Map<String, Object> notification = new HashMap<>();
-        //notification.put("room_name", room.getName());
-        notification.put("type", notificationType);
-        notification.put("timestamp", timestamp);
-        notification.put("userID", userID);
-        db.collection("notifications")
-                .add(notification)
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("NOTIFICATION_STATE", "Notify state sucess: "
-                                    + notification);
-                        }
-                        else {
-                            Log.d("NOTIFICATION_STATE", "Notify state fail");
-                        }
-                    }
-                });
-    }
-
-    private JSONObject getJSONData(int state, boolean isFan) {
-        JSONObject jsonObject = new JSONObject();
-        String id = isFan?"6":"1";
-        String name = isFan?"TRAFFIC":"LED";
-        String data = Integer.toBinaryString(state);
-        if (data.length() == 1) data = '0' + data;
-        String unit = "";
-        try {
-            jsonObject.put("id", id);
-            jsonObject.put("name", name);
-            jsonObject.put("data", data);
-            jsonObject.put("unit", unit);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
-    }
-
     private void setupMqttService() {
         // MQTT Service
         mqttService = new MQTTService(this);
@@ -318,8 +147,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                processMessage(message);
-                Log.d("Mqtt_receive", topic + ": " + message.toString());
+
             }
 
             @Override
@@ -329,56 +157,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         });
     }
 
-    private void processMessage(MqttMessage message) throws JSONException {
-        JSONObject jsonObject = new JSONObject(new String(message.getPayload()));
-        Float data = Float.valueOf(jsonObject.getString("data"));
-        if (jsonObject.get("name").equals("LIGHT")) { // light sensor
-            // store to db
-            writeSensorData(jsonObject);
-            // check light intensity
-            onLightDataArrived(data);
-        }
-        else if (jsonObject.get("name").equals("TEMP-HUMID")) { // temp-humid sensor
-            // store to db
-            writeSensorData(jsonObject);
-            // check temperature
-            onTemperatureDataArrived(data);
-        }
-    }
-
-    private void writeSensorData(JSONObject jsonObject) {
-        try {
-            String data = jsonObject.getString("data");
-            String sensor_name = jsonObject.getString("name");
-            String collection = sensor_name.equals("LIGHT")?"light_records":"temp_humid_records";
-            Map<String, Object> record = new HashMap<>();
-            if (sensor_name.equals("LIGHT")) {
-                record.put("data", Integer.valueOf(data));
-            }
-            else {
-                String[] temp_humid = data.split("-");
-                record.put("temp_data", Integer.valueOf(temp_humid[0]));
-                record.put("humid_data", Integer.valueOf(temp_humid[1]));
-            }
-            record.put("timestamp", FieldValue.serverTimestamp());
-            db.collection(collection)
-                    .add(record)
-                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-                                Log.d("SENSOR", "Write data success: " + record);
-                            }
-                            else {
-                                Log.d("SENSOR", "Write fail");
-                            }
-                        }
-                    });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    private void sendDataMQTT(String data, String topic) {
+    private void sendDataMQTT(String data, String feed) {
         MqttMessage msg = new MqttMessage();
         msg.setId(1234);
         msg.setQos(0);
@@ -388,13 +167,56 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         msg.setPayload(b);
 
         try {
-            mqttService.mqttAndroidClient.publish(topic, msg);
-            Log.w("Mqtt", topic + ": " + msg);
+            mqttService.mqttAndroidClient.publish(feed, msg);
+            Log.w("Mqtt", feed + ": " + msg);
         } catch (MqttPersistenceException e) {
             e.printStackTrace();
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getValue(int state) {
+        switch (state){
+            case LIGHT_HIGH: return "0";
+            case LIGHT_LOW: return "1";
+            case TEMP_XLOW: return "0";
+            case TEMP_LOW: return "85";
+            case TEMP_MEDIUM: return "170";
+            case TEMP_HIGH: return "25";
+            default: return "null";
+        }
+    }
+
+    @Override
+    public void onLedChange(int state) {
+        // MQTT send
+        JSONObject value = new JSONObject();
+        try {
+            value.put("id", LED);
+            value.put("name", "LED");
+            value.put("data", getValue(state));
+            value.put("unit", "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        sendDataMQTT(value.toString(), LED_FEED);
+    }
+
+    @Override
+    public void onFanChange(int state) {
+        JSONObject value = new JSONObject();
+        try {
+            value.put("id", FAN);
+            value.put("name", "DRV_PWM");
+            value.put("data", getValue(state));
+            value.put("unit", "");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        sendDataMQTT(value.toString(), FAN_FEED);
     }
 
     // notification
@@ -428,25 +250,38 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     }
 
     private void listenToNotification() {
-        db.collection("notifications")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        // notification view
-                        // system notification
-                        for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
-                            if (dc.getType() == DocumentChange.Type.ADDED) {
-                                Log.d("NOTIFICATION", "New notification!");
-                                NotificationItem item = dc.getDocument().toObject(NotificationItem.class);
-                                String title = item.getType().replace("_", " ").toUpperCase();
-                                String text = item.getContent();
-                                sendOnChannel(title, text);
-                            }
-                        }
-                    }
-                });
-    }
+        db.child("Notifications").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                NotificationItem item = snapshot.getValue(NotificationItem.class);
+                try {
+                    String title = item.getTitle();
+                    String text = item.getNotification();
+                    sendOnChannel(title, text);
+                } catch (Exception e) {
+                    Log.e("listen notification: ", e.toString());
+                }
+            }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 }

@@ -10,21 +10,29 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.example.smarthome.Utils.RecordItem;
 import com.example.smarthome.Utils.RoomListener;
 import com.example.smarthome.R;
 import com.example.smarthome.Utils.Room;
+import com.google.firebase.database.*;
 import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelectedListener*/ {
+public class HomeFragment extends Fragment  {
+    final String LIGHT = "13";
+    final String TEMP_HUMID = "7";
+    final String LED = "1";
+    final String FAN = "10";
+    final int LIGHT_HIGH = 0;
+    final int LIGHT_LOW = 1;
+    final int TEMP_XLOW = 2;
+    final int TEMP_LOW = 3;
+    final int TEMP_MEDIUM = 4;
+    final int TEMP_HIGH = 5;
     private View layoutHome, layoutRoom;
-    // Home
-    private ImageView imgLivingRoom;
-    private ImageView imgBedroom;
-    private ImageView imgKitchen;
-    private ImageView imgBathroom;
     // Room
     private TextView tvTemperatureRoom;
     private TextView tvLightIntensityRoom;
@@ -33,7 +41,8 @@ public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelect
     private Spinner spinner;
     private Room room;
     // data
-    private FirebaseFirestore db;
+    final DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+
     private RoomListener roomListener;
 //    public HomeFragment() {
 //        room = null;
@@ -46,154 +55,86 @@ public class HomeFragment extends Fragment /*implements AdapterView.OnItemSelect
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = FirebaseFirestore.getInstance();
-//        if (room != null) loadRoom();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        // SCREEN
-        //layoutHome = view.findViewById(R.id.layoutHome);
         layoutRoom = view.findViewById(R.id.layoutRoom);
-        //layoutHome.setVisibility(room == null? View.VISIBLE: View.GONE);
-        //layoutRoom.setVisibility(room != null? View.VISIBLE: View.GONE);
-        // HOME
-        /*
-        imgLivingRoom = view.findViewById(R.id.imgLivingRoom);
-        imgBedroom = view.findViewById(R.id.imgBedroom);
-        imgKitchen = view.findViewById(R.id.imgKitchen);
-        imgBathroom = view.findViewById(R.id.imgBathroom);
-        // IMAGE ON CLICK
-        imgLivingRoom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Room room = new Room(Room.RoomType.LIVING_ROOM);
-                roomListener.onRoomChange(room, false);
-            }
-        });
-        imgBedroom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Room room = new Room(Room.RoomType.BEDROOM);
-                roomListener.onRoomChange(room, false);
-            }
-        });
-        imgKitchen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Room room = new Room(Room.RoomType.KITCHEN);
-                roomListener.onRoomChange(room, false);
-            }
-        });
-        imgBathroom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Room room = new Room(Room.RoomType.BATHROOM);
-                roomListener.onRoomChange(room, false);
-            }
-        });
-         */
-        // ROOM
+
         tvTemperatureRoom = view.findViewById(R.id.tvTemperatureRoom);
         tvLightIntensityRoom = view.findViewById(R.id.tvLightIntensityRoom);
         tvHumidityRoom = view.findViewById(R.id.tvHumidityRoom);
-        /*
-        imgBackHome = view.findViewById(R.id.imgBackHome);
-        imgBackHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                roomListener.onRoomChange(null, false);
-            }
-        });
-        */
-        // spinner
-//        spinner = view.findViewById(R.id.spinnerRoom);
-//        spinner.setOnItemSelectedListener(this);
 
         loadData();
         return view;
     }
 
-    private void loadRoom() {
-        db.collection("rooms").whereEqualTo("type", room.getStringType())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot,
-                                        @Nullable FirebaseFirestoreException error) {
-
-                        // get room names
-                        List<String> roomNames = new ArrayList<>();
-                        if (!room.getName().equals("")) roomNames.add(room.getName());
-                        for (DocumentSnapshot document: querySnapshot.getDocuments()) {
-                            if (!document.getString("name").equals(room.getName())) {
-                                roomNames.add(document.getString("name"));
-                            }
-                        }
-                        // create adapter for spinner
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                                getActivity(),
-                                R.layout.support_simple_spinner_dropdown_item,
-                                roomNames);
-                        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-                        spinner.setAdapter(adapter);
-                    }
-                });
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        if (context instanceof RoomListener) {
-            roomListener = (RoomListener) context;
-        }
-    }
-
-
     private void loadData() {
         // Light intensity
-        db.collection("light_records")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-                        tvLightIntensityRoom.setText(String.format("%d lux", document.get("data")));
-                    }
-                });
+        db.child("Records").child(LIGHT).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot == null) return;
+                RecordItem item = snapshot.getValue(RecordItem.class);
+                String data = item.getValue();
+                tvLightIntensityRoom.setText(String.format("%s lux", data));
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         // Temp humid
-        db.collection("temp_humid_records")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-                        tvTemperatureRoom.setText(String.format("%d ˚C", document.getString("temp_data")));
-                        tvHumidityRoom.setText(String.format("%.2f %", Float.parseFloat(document.getString("humid_data"))/100));
-                    }
-                });
+        db.child("Records").child(TEMP_HUMID).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot == null) return;
+                RecordItem item = snapshot.getValue(RecordItem.class);
+                String[] data = item.getValue().split("-");
+                int temp = Integer.parseInt(data[0]);
+                int humid = Integer.parseInt(data[1]);
+                tvTemperatureRoom.setText(String.format("%d ˚C", temp));
+                tvHumidityRoom.setText(String.format("%.2f %", humid/100));
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
-    /*
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String roomName = parent.getItemAtPosition(position).toString();
-        if (!room.getName().equals(roomName)) {
-            roomListener.onRoomChange(
-                    new Room(room.getType(),
-                            parent.getItemAtPosition(position).toString()),
-                    false
-            );
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-    */
 }

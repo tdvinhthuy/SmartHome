@@ -2,6 +2,7 @@ package com.example.smarthome.Utils;
 
 import android.content.Context;
 import android.util.Log;
+import com.example.smarthome.Activity.MainActivity;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.*;
 
@@ -11,23 +12,50 @@ import java.util.List;
 
 public class MQTTService {
     private final String serverUri = "tcp://io.adafruit.com:1883";
-//    private String serverUri = "https://io.adafruit.com/";
     private final String clientID = "";
-    private final String username = "CSE_BBC";
-    private final String key = "";
-    private final String LED_FEED = "CSE_BBC/feeds/bk-iot-led";
-    private final String FAN_FEED = "CSE_BBC/feeds/bk-iot-drv";
+    private String username;
+    private String key;
+    private String LED_FEED;
+    private String FAN_FEED;
+
     private List<String> FEEDS;
     public MqttAndroidClient mqttAndroidClient;
 
-    public MQTTService(Context context) {
-        // mqtt client
-        mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientID);
+    public List<String> getFEEDS() {
+        return FEEDS;
+    }
 
+    public String getFAN_FEED() {
+        return FAN_FEED;
+    }
+
+    public String getLED_FEED() {
+        return LED_FEED;
+    }
+
+    public void setup(boolean test) {
+        if (test) {
+            username = "smarthomehcmut";
+            key = "aio_yPRQ24NT0LXN6itBeH9yBa00MhVz";
+            LED_FEED = "smarthomehcmut/feeds/bk-iot-led";
+            FAN_FEED = "smarthomehcmut/feeds/bk-iot-drv";
+        }
+        else {
+            username = "CSE_BBC";
+            key = "";
+            LED_FEED = "CSE_BBC/feeds/bk-iot-led";
+            FAN_FEED = "CSE_BBC/feeds/bk-iot-drv";
+        }
         // feeds
         FEEDS = new ArrayList<>();
         FEEDS.add(LED_FEED);
         FEEDS.add(FAN_FEED);
+    }
+    public MQTTService(Context context) {
+        setup(MainActivity.TEST); // setup(boolean test)
+
+        // mqtt client
+        mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientID);
 
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override

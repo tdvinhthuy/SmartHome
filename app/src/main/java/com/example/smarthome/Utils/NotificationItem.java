@@ -1,5 +1,6 @@
 package com.example.smarthome.Utils;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class NotificationItem {
@@ -19,9 +20,6 @@ public class NotificationItem {
     private Date time;
 
     public NotificationItem() {
-        this.device = "";
-        this.state = -1;
-        this.time = null;
     }
 
     public NotificationItem(String device, int state, Date time) {
@@ -59,6 +57,24 @@ public class NotificationItem {
 
     public void setTime(Date time) {
         this.time = time;
+    }
+
+    public String getStringTime() {
+        String[] months = {
+                "Jan", "Feb", "Mar", "Apr",
+                "May", "Jun", "Jul", "Aug",
+                "Sep", "Oct", "Nov", "Dec"};
+        Calendar cal = Calendar.getInstance();
+        if (time != null) cal.setTime(time);
+        String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
+        String minute = String.valueOf(cal.get(Calendar.MINUTE));
+        hour = hour.length() == 1?'0'+ hour:hour;
+        minute = minute.length() == 1?'0' + minute:minute;
+        return hour + ":"
+                + minute + ", "
+                + months[cal.get(Calendar.MONTH)] + " "
+                + cal.get(Calendar.DAY_OF_MONTH) + ", "
+                + cal.get(Calendar.YEAR);
     }
 
     public String getNotification() {

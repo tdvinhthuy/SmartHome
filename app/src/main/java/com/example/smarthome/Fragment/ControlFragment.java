@@ -11,11 +11,16 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.example.smarthome.Activity.MainActivity;
 import com.example.smarthome.R;
+import com.example.smarthome.Utils.NotificationItem;
+import com.example.smarthome.Utils.RecordItem;
 import com.example.smarthome.Utils.RoomListener;
 import com.example.smarthome.Utils.StateItem;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.*;
+import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.Query;
 
 public class ControlFragment extends Fragment {
     final String LIGHT = "13";
@@ -37,7 +42,8 @@ public class ControlFragment extends Fragment {
     private RadioButton rbHigh;
     private SwitchCompat switchFan;
     private SwitchCompat switchLed;
-    final DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+//    final DatabaseReference db = FirebaseDatabase.getInstance("https://hcmut-smart-home-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference();
     private RoomListener roomListener;
     private CompoundButton.OnCheckedChangeListener ledListener;
     private CompoundButton.OnCheckedChangeListener fanListener;
@@ -129,132 +135,78 @@ public class ControlFragment extends Fragment {
     }
 
     private void loadDeviceState(String device) {
-        db.child("States").child(device).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (snapshot == null) return;
-                StateItem item = snapshot.getValue(StateItem.class);
-                int state = item.getState();
+        db.collection("States")
+          .whereEqualTo("device", device)
+          .orderBy("time", Query.Direction.DESCENDING)
+          .addSnapshotListener(new EventListener<QuerySnapshot>() {
+              @Override
+              public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                  if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                  // notification view
+                  // system notification
+                  for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
+                      if (dc.getType() == DocumentChange.Type.ADDED) {
+                          StateItem item = dc.getDocument().toObject(StateItem.class);
+                          int state = item.getState();
 
-                if (state == LIGHT_LOW || state == LIGHT_HIGH) {
-                    switchLed.setOnCheckedChangeListener(null);
-                    switchLed.setChecked(state == LIGHT_LOW);
-                    switchLed.setOnCheckedChangeListener(ledListener);
-                }
-                else if (state == TEMP_XLOW) {
-                    switchFan.setOnCheckedChangeListener(null);
-                    switchFan.setChecked(false);
-                    switchFan.setOnCheckedChangeListener(fanListener);
-                    rgFan.clearCheck();
-                    for (int i = 0; i < rgFan.getChildCount(); i++) {
-                        rgFan.getChildAt(i).setEnabled(false);
-                    }
-                } else {
-                    switchFan.setOnCheckedChangeListener(null);
-                    switchFan.setChecked(true);
-                    switchFan.setOnCheckedChangeListener(fanListener);
-                    switch (state) {
-                        case TEMP_LOW:
-                            rbLow.setChecked(true);
-                            break;
-                        case TEMP_MEDIUM:
-                            rbMedium.setChecked(true);
-                            break;
-                        case TEMP_HIGH:
-                            rbHigh.setChecked(true);
-                            break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+                          if (state == LIGHT_LOW || state == LIGHT_HIGH) {
+                              switchLed.setOnCheckedChangeListener(null);
+                              switchLed.setChecked(state == LIGHT_LOW);
+                              switchLed.setOnCheckedChangeListener(ledListener);
+                          }
+                          else if (state == TEMP_XLOW) {
+                              switchFan.setOnCheckedChangeListener(null);
+                              switchFan.setChecked(false);
+                              switchFan.setOnCheckedChangeListener(fanListener);
+                              rgFan.clearCheck();
+                              for (int i = 0; i < rgFan.getChildCount(); i++) {
+                                  rgFan.getChildAt(i).setEnabled(false);
+                              }
+                          } else {
+                              switchFan.setOnCheckedChangeListener(null);
+                              switchFan.setChecked(true);
+                              switchFan.setOnCheckedChangeListener(fanListener);
+                              switch (state) {
+                                  case TEMP_LOW:
+                                      rbLow.setChecked(true);
+                                      break;
+                                  case TEMP_MEDIUM:
+                                      rbMedium.setChecked(true);
+                                      break;
+                                  case TEMP_HIGH:
+                                      rbHigh.setChecked(true);
+                                      break;
+                              }
+                          }
+                      }
+                  }
+              }
+          });
     }
 
 
     private void loadSensorData(String sensor) {
-        // Light intensity
-//        db.child("Records").child(sensor).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot dataSnapshot: snapshot.getChildren()) {
-//                    try {
-//                        String data = dataSnapshot.child("value").getValue().toString();
-//                        if (sensor.equals(LIGHT)) {
-//                            tvTempVal.setText(data + " lux");
-//                        }
-//                        else {
-//                            String temp = data.split("-")[0];
-//                            tvTempVal.setText(temp + " ˚C");
-//                        }
-//                    }
-//                    catch (Exception e){
-//                        Log.e("Load data ", e.toString());
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-        db.child("Records").child(sensor).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                try {
-                    String data = snapshot.child("value").getValue().toString();
-                    if (sensor.equals(LIGHT)) {
-                        tvTempVal.setText(data + " lux");
+        db.collection("Records")
+                .whereEqualTo("device", sensor)
+                .orderBy("time", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+
+                        if (sensor.equals(LIGHT)) {
+                            tvLightIntVal.setText(document.get("value") + "  lux");
+                        }
+                        else if (sensor.equals(TEMP_HUMID)) {
+                            String data = document.get("value").toString().replace("\0","");
+
+                            String[] value = data.split("-");
+                            String temp = value[0];
+                            String humid = value[1];
+                            tvTempVal.setText(temp + " ˚C");
+                        }
                     }
-                    else {
-                        String temp = data.split("-")[0];
-                        tvTempVal.setText(temp + " ˚C");
-                    }
-                }
-                catch (Exception e){
-                    Log.e("Load data ", e.toString());
-                }
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+                });
     }
 }

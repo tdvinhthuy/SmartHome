@@ -161,7 +161,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="No Data"
-                    android:textColor="@color/humidity"
+                    android:textColor="@color/light_intensity"
                     android:textStyle="bold"
                     android:textSize="40sp"
                     android:layout_below="@id/imgWater"

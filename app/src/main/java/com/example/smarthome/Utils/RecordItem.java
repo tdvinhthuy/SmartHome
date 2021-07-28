@@ -14,14 +14,18 @@ public class RecordItem {
     final int TEMP_MEDIUM = 4;
     final int TEMP_HIGH = 5;
 
+    private String id;
+    private Date time;
     private String value;
 
     public RecordItem() {
-        this.value = "";
     }
 
-    public RecordItem(String value) {
+    public RecordItem(String id, Date time, String value) {
+        this.id = id;
+        this.time = time;
         this.value = value;
+
     }
 
     public String getValue() {
@@ -30,5 +34,21 @@ public class RecordItem {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

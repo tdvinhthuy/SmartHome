@@ -3,25 +3,16 @@ package com.example.smarthome.Utils;
 import java.util.Date;
 
 public class StateItem {
-    final String LIGHT = "13";
-    final String TEMP_HUMID = "7";
-    final String LED = "1";
-    final String FAN = "10";
-    final int LIGHT_HIGH = 0;
-    final int LIGHT_LOW = 1;
-    final int TEMP_XLOW = 2;
-    final int TEMP_LOW = 3;
-    final int TEMP_MEDIUM = 4;
-    final int TEMP_HIGH = 5;
-
+    private String device;
     private int state;
+    private Date time;
 
-    public StateItem() {
-        this.state = -1;
-    }
+    public StateItem() {}
 
-    public StateItem(int state) {
+    public StateItem(String device, int state, Date time) {
+        this.device = device;
         this.state = state;
+        this.time = time;
     }
 
     public void setState(int state) {
@@ -32,4 +23,19 @@ public class StateItem {
         return state;
     }
 
+    public void setDevice(String device) {
+        this.device = device;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
 }

@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 import com.google.firebase.firestore.*;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import org.eclipse.paho.client.mqttv3.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,18 +66,28 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Notification
+        FirebaseMessaging.getInstance().subscribeToTopic("NOTIFICATION")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (!task.isSuccessful()) {
+                            Log.e("FCM", "Subscribe to FCM topic: NOTIFICATION!");
+                        }
+                    }
+                });
         // MQTT
         setupMqttService();
         // setup view
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         tvDate = findViewById(R.id.tvDate);
         // channel for LIGHT - TEMP_HUMID - LED - FAN
-        createNotificationChannel();
-        createNotificationChannel();
-        createNotificationChannel();
-        createNotificationChannel();
+//        createNotificationChannel();
+//        createNotificationChannel();
+//        createNotificationChannel();
+//        createNotificationChannel();
         // notification listener
-        listenToNotification();
+//        listenToNotification();
         // set date
         setDate();
         // fragment
@@ -228,62 +239,62 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         }
     }
 
-    // notification
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Notification Channel";
-            String description = "This is notification channel";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void sendOnChannel(String title, String text, int timestampId) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(timestampId, builder.build());
-    }
-
-    private void listenToNotification() {
-        db.collection("UnreadNotifications").orderBy("time")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
-                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                        // system notification
-                        for (DocumentSnapshot dc : querySnapshot.getDocuments()) {
-                                Log.d("NOTIFICATION", "New notification!");
-                                NotificationItem item = dc.toObject(NotificationItem.class);
-                                String title = item.getTitle();
-                                String text = item.getNotification();
-                                text = text + " on " + item.getStringTime();
-                                String device = item.getDevice();
-                                Date time = item.getTime();
-                                sendOnChannel(title, text, (int)time.getTime());
-                                dc.getReference().delete();
-                        }
-                    }
-                });
-    }
+//    // notification
+//    private void createNotificationChannel() {
+//        // Create the NotificationChannel, but only on API 26+ because
+//        // the NotificationChannel class is new and not in the support library
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            CharSequence name = "Notification Channel";
+//            String description = "This is notification channel";
+//            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+//            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+//            channel.setDescription(description);
+//            // Register the channel with the system; you can't change the importance
+//            // or other notification behaviors after this
+//            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+//            notificationManager.createNotificationChannel(channel);
+//        }
+//    }
+//
+//    private void sendOnChannel(String title, String text, int timestampId) {
+//        Intent intent = new Intent(this, MainActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_launcher_foreground)
+//                .setContentTitle(title)
+//                .setContentText(text)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+//                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+//                .setContentIntent(pendingIntent)
+//                .setAutoCancel(true);
+//
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//        // notificationId is a unique int for each notification that you must define
+//        notificationManager.notify(timestampId, builder.build());
+//    }
+//
+//    private void listenToNotification() {
+//        db.collection("UnreadNotifications").orderBy("time")
+//                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+//                        if (querySnapshot == null || querySnapshot.isEmpty()) return;
+//                        // system notification
+//                        for (DocumentSnapshot dc : querySnapshot.getDocuments()) {
+//                                Log.d("NOTIFICATION", "New notification!");
+//                                NotificationItem item = dc.toObject(NotificationItem.class);
+//                                String title = item.getTitle();
+//                                String text = item.getNotification();
+//                                text = text + " on " + item.getStringTime();
+//                                String device = item.getDevice();
+//                                Date time = item.getTime();
+//                                sendOnChannel(title, text, (int)time.getTime());
+//                                dc.getReference().delete();
+//                        }
+//                    }
+//                });
+//    }
 }

@@ -43,12 +43,10 @@ public class ControlFragment extends Fragment {
     private SwitchCompat switchFan;
     private SwitchCompat switchLed;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-//    final DatabaseReference db = FirebaseDatabase.getInstance("https://hcmut-smart-home-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference();
     private RoomListener roomListener;
     private CompoundButton.OnCheckedChangeListener ledListener;
     private CompoundButton.OnCheckedChangeListener fanListener;
     private TextView tvTempVal, tvLightIntVal;
-    private ArrayAdapter<String> adapter;
 
 
     @Override
@@ -163,6 +161,9 @@ public class ControlFragment extends Fragment {
                       switchFan.setOnCheckedChangeListener(null);
                       switchFan.setChecked(true);
                       switchFan.setOnCheckedChangeListener(fanListener);
+                      for (int i = 0; i < rgFan.getChildCount(); i++) {
+                          rgFan.getChildAt(i).setEnabled(true);
+                      }
                       switch (state) {
                           case TEMP_LOW:
                               rbLow.setChecked(true);

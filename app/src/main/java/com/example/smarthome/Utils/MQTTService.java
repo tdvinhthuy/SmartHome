@@ -17,6 +17,8 @@ public class MQTTService {
     private String key;
     private String LED_FEED;
     private String FAN_FEED;
+    private String TEST_LED_FEED;
+    private String TEST_FAN_FEED;
 
     private List<String> FEEDS;
     public MqttAndroidClient mqttAndroidClient;
@@ -33,12 +35,22 @@ public class MQTTService {
         return LED_FEED;
     }
 
+    public String getTEST_LED_FEED() {
+        return TEST_LED_FEED;
+    }
+
+    public String getTEST_FAN_FEED() {
+        return TEST_FAN_FEED;
+    }
+
     public void setup(boolean test) {
         if (test) {
             username = "smarthomehcmut";
             key = "aio_yPRQ24NT0LXN6itBeH9yBa00MhVz";
             LED_FEED = "smarthomehcmut/feeds/bk-iot-led";
             FAN_FEED = "smarthomehcmut/feeds/bk-iot-drv";
+            TEST_LED_FEED = "smarthomehcmut/feeds/LED";
+            TEST_FAN_FEED = "smarthomehcmut/feeds/DRV";
         }
         else {
             username = "CSE_BBC";

@@ -22,6 +22,12 @@ public class NotificationService extends FirebaseMessagingService {
     private static final String CHANNEL_ID = "NOTIFICATION";
     private int counter = 0;
 
+    private static final NotificationService notificationService = new NotificationService();
+
+    public static NotificationService getInstance() {
+        return notificationService;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -49,8 +55,7 @@ public class NotificationService extends FirebaseMessagingService {
             Log.d("FCM", "Message Notification Title: " + title);
             Log.d("FCM", "Message Notification Body: " + text);
 
-            sendOnChannel(title, text);
-
+//            sendOnChannel(title, text);
         }
 
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -74,7 +79,7 @@ public class NotificationService extends FirebaseMessagingService {
         }
     }
 
-    private void sendOnChannel(String title, String text) {
+    public void sendOnChannel(String title, String text) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

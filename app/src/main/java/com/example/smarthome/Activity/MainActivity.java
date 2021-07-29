@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
 
     private int LIGHT_CURRENT_STATE = -1;
     private int FAN_CURRENT_STATE = -1;
+    private NotificationService notificationService = NotificationService.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

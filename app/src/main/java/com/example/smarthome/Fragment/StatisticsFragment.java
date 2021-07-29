@@ -119,8 +119,16 @@ public class StatisticsFragment extends Fragment {
         final int year = calendar.get(Calendar.YEAR);
         final int month = calendar.get(Calendar.MONTH);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Yesterday
+        String yesterday;
+        Calendar date = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("d/M/yyyy");
+        date.add(Calendar.DATE, -1);
+        yesterday = dateFormat.format(date.getTime());
+
         // default value
-        tvFromDate.setText(String.format("%s/%s/%s", day, month+1, year));
+        tvFromDate.setText(yesterday);
         tvToDate.setText(String.format("%s/%s/%s", day, month+1, year));
         tvDateError.setText("");
         // date listener
@@ -196,7 +204,7 @@ public class StatisticsFragment extends Fragment {
                 DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 date.add(Calendar.DATE, -1);
                 yesterday = dateFormat.format(date.getTime());
-
+                Log.d("YESTERDAY", String.valueOf(yesterday));
                 loadReport(yesterday, yesterday);
 //                Log.d("YESTERDAY DATE", yesterday);
             }

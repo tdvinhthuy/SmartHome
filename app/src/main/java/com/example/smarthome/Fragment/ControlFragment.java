@@ -77,9 +77,6 @@ public class ControlFragment extends Fragment {
                 }
             }
         };
-
-        loadDeviceState(LED);
-        loadDeviceState(FAN);
     }
 
     @Override
@@ -120,6 +117,9 @@ public class ControlFragment extends Fragment {
         // get text view of temperature value and light intensity value
         tvTempVal = view.findViewById(R.id.tvTemperature);
         tvLightIntVal = view.findViewById(R.id.tvLightIntVal);
+
+        loadDeviceState(LED);
+        loadDeviceState(FAN);
         loadSensorData(TEMP_HUMID);
         loadSensorData(LIGHT);
         return view;
@@ -142,42 +142,37 @@ public class ControlFragment extends Fragment {
               @Override
               public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
                   if (querySnapshot == null || querySnapshot.isEmpty()) return;
-                  // notification view
-                  // system notification
-                  for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
-                      if (dc.getType() == DocumentChange.Type.ADDED) {
-                          StateItem item = dc.getDocument().toObject(StateItem.class);
-                          int state = item.getState();
+                  DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                  StateItem item = document.toObject(StateItem.class);
+                  int state = item.getState();
 
-                          if (state == LIGHT_LOW || state == LIGHT_HIGH) {
-                              switchLed.setOnCheckedChangeListener(null);
-                              switchLed.setChecked(state == LIGHT_LOW);
-                              switchLed.setOnCheckedChangeListener(ledListener);
-                          }
-                          else if (state == TEMP_XLOW) {
-                              switchFan.setOnCheckedChangeListener(null);
-                              switchFan.setChecked(false);
-                              switchFan.setOnCheckedChangeListener(fanListener);
-                              rgFan.clearCheck();
-                              for (int i = 0; i < rgFan.getChildCount(); i++) {
-                                  rgFan.getChildAt(i).setEnabled(false);
-                              }
-                          } else {
-                              switchFan.setOnCheckedChangeListener(null);
-                              switchFan.setChecked(true);
-                              switchFan.setOnCheckedChangeListener(fanListener);
-                              switch (state) {
-                                  case TEMP_LOW:
-                                      rbLow.setChecked(true);
-                                      break;
-                                  case TEMP_MEDIUM:
-                                      rbMedium.setChecked(true);
-                                      break;
-                                  case TEMP_HIGH:
-                                      rbHigh.setChecked(true);
-                                      break;
-                              }
-                          }
+                  if (state == LIGHT_LOW || state == LIGHT_HIGH) {
+                      switchLed.setOnCheckedChangeListener(null);
+                      switchLed.setChecked(state == LIGHT_LOW);
+                      switchLed.setOnCheckedChangeListener(ledListener);
+                  }
+                  else if (state == TEMP_XLOW) {
+                      switchFan.setOnCheckedChangeListener(null);
+                      switchFan.setChecked(false);
+                      switchFan.setOnCheckedChangeListener(fanListener);
+                      rgFan.clearCheck();
+                      for (int i = 0; i < rgFan.getChildCount(); i++) {
+                          rgFan.getChildAt(i).setEnabled(false);
+                      }
+                  } else {
+                      switchFan.setOnCheckedChangeListener(null);
+                      switchFan.setChecked(true);
+                      switchFan.setOnCheckedChangeListener(fanListener);
+                      switch (state) {
+                          case TEMP_LOW:
+                              rbLow.setChecked(true);
+                              break;
+                          case TEMP_MEDIUM:
+                              rbMedium.setChecked(true);
+                              break;
+                          case TEMP_HIGH:
+                              rbHigh.setChecked(true);
+                              break;
                       }
                   }
               }

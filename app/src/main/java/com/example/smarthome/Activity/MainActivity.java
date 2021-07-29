@@ -2,6 +2,8 @@ package com.example.smarthome.Activity;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Build;
 import android.service.notification.NotificationListenerService;
 import android.util.JsonReader;
@@ -26,16 +28,14 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.EventListener;
 import org.eclipse.paho.client.mqttv3.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements RoomListener {
 
@@ -49,9 +49,8 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
     final int TEMP_LOW = 3;
     final int TEMP_MEDIUM = 4;
     final int TEMP_HIGH = 5;
-
     public static final boolean TEST = true;
-
+    private final String CHANNEL_ID = "Notifications";
     FirebaseFirestore database = FirebaseFirestore.getInstance();
     private TextView tvDate;
     private MQTTService mqttService;
@@ -72,10 +71,10 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         tvDate = findViewById(R.id.tvDate);
         // channel for LIGHT - TEMP_HUMID - LED - FAN
-        createNotificationChannel(LIGHT);
-        createNotificationChannel(TEMP_HUMID);
-        createNotificationChannel(LED);
-        createNotificationChannel(FAN);
+        createNotificationChannel();
+        createNotificationChannel();
+        createNotificationChannel();
+        createNotificationChannel();
         // notification listener
         listenToNotification();
         // set date
@@ -196,16 +195,18 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         try {
             value.put("id", LED);
             value.put("name", "LED");
-            if (TEST) {
-                value.put("value", getValue(state).equals("1")?"ON":"OFF");
-            }
             value.put("data", getValue(state));
             value.put("unit", "");
+            sendDataMQTT(value.toString(), mqttService.getLED_FEED());
+            if (TEST) {
+                value.put("value", getValue(state).equals("1")?"ON":"OFF");
+                sendDataMQTT(value.toString(), mqttService.getTEST_LED_FEED());
+
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        sendDataMQTT(value.toString(), mqttService.getLED_FEED());
     }
 
     @Override
@@ -214,20 +215,21 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         try {
             value.put("id", FAN);
             value.put("name", "DRV_PWM");
-            if (TEST) {
-                value.put("value", getValue(state));
-            }
             value.put("data", getValue(state));
             value.put("unit", "");
+            sendDataMQTT(value.toString(), mqttService.getFAN_FEED());
+            if (TEST) {
+                value.put("value", getValue(state));
+                sendDataMQTT(value.toString(), mqttService.getTEST_FAN_FEED());
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        sendDataMQTT(value.toString(), mqttService.getFAN_FEED());
     }
 
     // notification
-    private void createNotificationChannel(String CHANNEL_ID) {
+    private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -243,35 +245,43 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
         }
     }
 
-    private void sendOnChannel(String title, String text, String CHANNEL_ID) {
+    private void sendOnChannel(String title, String text, int timestampId) {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(title)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE);
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(timestampId, builder.build());
     }
 
     private void listenToNotification() {
-        db.collection("Notifications").orderBy("time")
+        db.collection("UnreadNotifications").orderBy("time")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
                         if (querySnapshot == null || querySnapshot.isEmpty()) return;
                         // system notification
-                        for (DocumentChange dc : querySnapshot.getDocumentChanges()) {
-                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                        for (DocumentSnapshot dc : querySnapshot.getDocuments()) {
                                 Log.d("NOTIFICATION", "New notification!");
-                                NotificationItem item = dc.getDocument().toObject(NotificationItem.class);
+                                NotificationItem item = dc.toObject(NotificationItem.class);
                                 String title = item.getTitle();
                                 String text = item.getNotification();
+                                text = text + " on " + item.getStringTime();
                                 String device = item.getDevice();
-                                sendOnChannel(title, text, device);
-                            }
+                                Date time = item.getTime();
+                                sendOnChannel(title, text, (int)time.getTime());
+                                dc.getReference().delete();
                         }
                     }
                 });

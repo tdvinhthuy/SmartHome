@@ -98,6 +98,22 @@ title __SMARTHOME.APP's Class Diagram__\n
 
   namespace com.example.smarthome {
     namespace Utils {
+      class com.example.smarthome.Utils.NotificationService {
+      }
+    }
+  }
+  
+
+  namespace com.example.smarthome {
+    namespace Utils {
+      class com.example.smarthome.Utils.RecordItem {
+      }
+    }
+  }
+  
+
+  namespace com.example.smarthome {
+    namespace Utils {
       class com.example.smarthome.Utils.Room {
       }
     }
@@ -112,17 +128,24 @@ title __SMARTHOME.APP's Class Diagram__\n
   }
   
 
+  namespace com.example.smarthome {
+    namespace Utils {
+      class com.example.smarthome.Utils.StateItem {
+      }
+    }
+  }
+  
+
   com.example.smarthome.Activity.LoginActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.smarthome.Activity.MainActivity .up.|> com.example.smarthome.Utils.RoomListener
   com.example.smarthome.Activity.MainActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.smarthome.Activity.MainActivity o-- com.example.smarthome.Utils.MQTTService : mqttService
+  com.example.smarthome.Activity.MainActivity o-- com.example.smarthome.Utils.NotificationService : notificationService
   com.example.smarthome.Activity.SignUpActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.smarthome.Fragment.AccountFragment -up-|> androidx.fragment.app.Fragment
   com.example.smarthome.Fragment.ControlFragment -up-|> androidx.fragment.app.Fragment
   com.example.smarthome.Fragment.ControlFragment o-- com.example.smarthome.Utils.RoomListener : roomListener
   com.example.smarthome.Fragment.HomeFragment -up-|> androidx.fragment.app.Fragment
-  com.example.smarthome.Fragment.HomeFragment o-- com.example.smarthome.Utils.Room : room
-  com.example.smarthome.Fragment.HomeFragment o-- com.example.smarthome.Utils.RoomListener : roomListener
   com.example.smarthome.Fragment.NotificationsFragment -up-|> androidx.fragment.app.Fragment
   com.example.smarthome.Fragment.NotificationsFragment o-- com.example.smarthome.Utils.NotificationAdapter : adapter
   com.example.smarthome.Fragment.StatisticsFragment -up-|> androidx.fragment.app.Fragment

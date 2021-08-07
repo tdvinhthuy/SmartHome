@@ -46,7 +46,7 @@ public class MQTTService {
     public void setup(boolean test) {
         if (test) {
             username = "smarthomehcmut";
-            key = "aio_yPRQ24NT0LXN6itBeH9yBa00MhVz";
+            key = "";
             LED_FEED = "smarthomehcmut/feeds/bk-iot-led";
             FAN_FEED = "smarthomehcmut/feeds/bk-iot-drv";
             TEST_LED_FEED = "smarthomehcmut/feeds/LED";
